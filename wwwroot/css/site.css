@@ -1,22 +1,153 @@
+/* Variables personalizadas */
+:root {
+    --app-bg-light: #f8f9fa;
+    --app-bg-dark: #212529;
+    --app-text-light: #333;
+    --app-text-dark: #fff;
+    --app-hover-light: #e9ecef;
+    --app-hover-dark: #343a40;
+}
+
+/* Global */
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    transition: background-color 0.3s, color 0.3s;
 }
+
+/* Botones y focus */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    outline: none;
+}
+
+/* Navbar, Sidebar y Footer (modo claro) */
+.navbar,
+.sidebar,
+footer {
+    background-color: var(--app-bg-light);
+    color: var(--app-text-light);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Modo oscuro */
+[data-bs-theme="dark"] .navbar,
+[data-bs-theme="dark"] .sidebar,
+[data-bs-theme="dark"] footer {
+    background-color: var(--app-bg-dark);
+    color: var(--app-text-dark);
+}
+
+/* Sidebar */
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 250px;
+    padding: 1rem;
+    transition: background-color 0.3s ease, color 0.3s ease, margin-left 0.3s ease;
+    overflow-y: auto;
+}
+
+    .sidebar .nav-link {
+        color: var(--app-text-light);
+        font-weight: 500;
+        margin-bottom: 8px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        border-radius: 0.375rem;
+    }
+
+        .sidebar .nav-link:hover {
+            background-color: var(--app-hover-light);
+            color: var(--app-text-light);
+        }
+
+[data-bs-theme="dark"] .sidebar .nav-link {
+    color: var(--app-text-dark);
+}
+
+    [data-bs-theme="dark"] .sidebar .nav-link:hover {
+        background-color: var(--app-hover-dark);
+        color: var(--app-text-dark);
+    }
+
+/* Footer */
+footer {
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* Wrapper y comportamiento toggle sidebar */
+#wrapper {
+    display: flex;
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+}
+
+    /* Sidebar oculto: movemos fuera de la pantalla */
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -250px;
+    }
+
+/* Transición suave */
+#sidebar-wrapper {
+    transition: margin-left 0.3s ease;
+}
+
+/* Contenido principal */
+#page-content-wrapper {
+    flex-grow: 1;
+    padding: 1rem;
+    transition: margin-left 0.3s ease;
+}
+
+/* Cuando sidebar oculto, el contenido llena todo el ancho */
+#wrapper.toggled #page-content-wrapper {
+    margin-left: 0;
+}
+
+/* Botón toggle sidebar */
+#sidebar-toggle-btn {
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+    #sidebar-toggle-btn:hover,
+    #sidebar-toggle-btn:focus {
+        color: #258cfb;
+        outline: none;
+    }
+
+/* Botón toggle tema */
+#themeToggle {
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+    #themeToggle:hover,
+    #themeToggle:focus {
+        color: #258cfb;
+        outline: none;
+    }
+
+    /*tablas*/

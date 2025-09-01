@@ -1,0 +1,101 @@
+﻿:root {
+    --primary-color: #4f46e5;
+    --hover-color: #4338ca;
+    --border-radius: 0.25rem;
+    --transition-speed: 0.3s;
+}
+
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: background-color var(--transition-speed);
+}
+
+    .btn-primary:hover {
+        background-color: var(--hover-color);
+    }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+}
+
+thead {
+    background-color: var(--primary-color);
+    color: #fff;
+    text-align: left;
+}
+
+th, td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+}
+
+tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+a.action-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    margin-right: 0.4rem;
+    transition: color var(--transition-speed);
+}
+
+    a.action-link:hover {
+        color: var(--hover-color);
+    }
+
+/* Barra de filtro */
+.filter-bar {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid #ccc;
+}
+
+/*botones*/
+/* Colores específicos para cada botón */
+/* ===== Estilos para botones de acción ===== */
+.edit-btn {
+    color: #1E40AF;
+    font-weight: 500;
+}
+
+    .edit-btn:hover {
+        color: #3B82F6;
+    }
+
+.details-btn {
+    color: #047857;
+    font-weight: 500;
+}
+
+    .details-btn:hover {
+        color: #10B981;
+    }
+
+.delete-btn {
+    color: #B91C1C;
+    font-weight: 500;
+}
+
+    .delete-btn:hover {
+        color: #EF4444;
+    }
+
+
+
+
+    /* Estilos para formularios */
+
