@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Primera.Models.Cliente>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Clientes</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear Nuevo</a>
+</p>
+
+<!-- Barra de filtro -->
+<input type="text" id="filterInput" placeholder="Filtrar por nombre, apellido o teléfono..." class="filter-bar" />
+
+<table id="vehiculosTable" class="table">
+    <thead>
+        <tr>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td data-label="Nombres">@Html.DisplayFor(modelItem => item.Nombres)</td>
+                <td data-label="Apellidos">@Html.DisplayFor(modelItem => item.Apellidos)</td>
+                <td data-label="Teléfono">@Html.DisplayFor(modelItem => item.Telefono)</td>
+                <td data-label="Dirección">@Html.DisplayFor(modelItem => item.Direccion)</td>
+                <td data-label="Acciones">
+                    <a asp-action="Edit" asp-route-id="@item.Id_Cliente" class="btn btn-sm btn-primary me-1">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Id_Cliente" class="btn btn-sm btn-success me-1">
+                        <i class="bi bi-eye"></i> Detalles
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Id_Cliente" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Reutilizar CSS y JS de Vehiculos -->
+<link rel="stylesheet" href="~/css/vehiculos.css" />
+<script src="~/js/vehiculos.js"></script>
