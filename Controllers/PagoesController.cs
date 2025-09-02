@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Primera.Models;
 
-namespace Primera.Models
+namespace Primera.Controllers
 {
     public class PagoesController : Controller
     {

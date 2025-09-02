@@ -9,6 +9,7 @@
       "Primera/1.0.0": {
         "dependencies": {
           "Microsoft.AspNetCore.Components.Analyzers": "8.0.11",
+          "Microsoft.AspNetCore.Components.QuickGrid": "8.0.11",
           "Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter": "8.0.11",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "8.0.18",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.18",
