@@ -7,6 +7,8 @@ namespace Primera.Models
 {
     public class Ticket
     {
+        private DateTime fecha_hora_entrada;
+
         [Key]
         public int Id_Ticket { get; set; }
 
@@ -18,8 +20,8 @@ namespace Primera.Models
         public int Id_Espacio { get; set; }
         public EspacioEstacionamiento EspacioEstacionamiento { get; set; }
 
-        [Required]g
-        public DateTime Fecha_hora_entrada { get; set; }
+        [Required]
+        public DateTime Fecha_hora_entrada { get => fecha_hora_entrada; set => fecha_hora_entrada = value; }
 
         public DateTime? Fecha_hora_salida { get; set; }
 

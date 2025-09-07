@@ -13,6 +13,8 @@ namespace Primera.Models
 
         [Required(ErrorMessage = "La marca es obligatoria")]
         [StringLength(50)]
+        public string Tipo_Vehiculo { get; set; }
+
         public string Marca { get; set; }
 
         [Required(ErrorMessage = "El color es obligatorio")]
