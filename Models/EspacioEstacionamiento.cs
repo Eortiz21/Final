@@ -24,6 +24,6 @@ namespace Primera.Models
         [StringLength(20)]
         public string Estado { get; set; }
 
-        public ICollection<Ticket> Tickets { get; set; }
+        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 }
