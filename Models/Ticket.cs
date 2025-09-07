@@ -18,7 +18,7 @@ namespace Primera.Models
         public int Id_Espacio { get; set; }
         public EspacioEstacionamiento EspacioEstacionamiento { get; set; }
 
-        [Required]g
+        [Required]
         public DateTime Fecha_hora_entrada { get; set; }
 
         public DateTime? Fecha_hora_salida { get; set; }
