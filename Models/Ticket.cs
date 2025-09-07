@@ -13,18 +13,28 @@ namespace Primera.Models
         [Required]
         [StringLength(20)]
         public string NoPlaca { get; set; }
+
+        // Relación con Vehiculo usando NoPlaca como FK
+        [ForeignKey(nameof(NoPlaca))]
         public Vehiculo Vehiculo { get; set; }
 
+        // Relación con EspacioEstacionamiento usando Id_Espacio como FK
+        [Required]
         public int Id_Espacio { get; set; }
+
+        [ForeignKey(nameof(Id_Espacio))]
         public EspacioEstacionamiento EspacioEstacionamiento { get; set; }
 
-        [Required]g
+        [Required]
         public DateTime Fecha_hora_entrada { get; set; }
 
         public DateTime? Fecha_hora_salida { get; set; }
 
-        [ForeignKey("Tarifa")]
+        // Relación con Tarifa
+        [Required]
         public int Id_Tarifa { get; set; }
+
+        [ForeignKey(nameof(Id_Tarifa))]
         public Tarifa Tarifa { get; set; }
 
         [Required]
