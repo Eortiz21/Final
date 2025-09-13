@@ -1,36 +1,39 @@
-﻿@model Primera.Models.TipoVehiculo
+﻿@model Primera.Models.Vehiculo
 
 @{
-    ViewData["Title"] = "Eliminar Tipo de Vehículo";
+    ViewData["Title"] = "Eliminar Vehículo";
 }
 
 <div class="container mt-5">
     <div class="card shadow-sm">
         <div class="card-header bg-danger text-white">
-            <h3 class="mb-0">Eliminar Tipo de Vehículo</h3>
+            <h3 class="mb-0">Eliminar Vehículo</h3>
         </div>
         <div class="card-body">
             <h5 class="text-warning mb-4">
                 <i class="bi bi-exclamation-triangle-fill"></i>
-                ¿Está seguro que desea eliminar este tipo de vehículo?
+                ¿Está seguro que desea eliminar este vehículo?
             </h5>
 
             <dl class="row">
-                <dt class="col-sm-3">Descripción</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Descripcion)</dd>
+                <dt class="col-sm-3">Placa</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.NoPlaca)</dd>
 
                 <dt class="col-sm-3">Marca</dt>
                 <dd class="col-sm-9">@Html.DisplayFor(model => model.Marca)</dd>
 
-                <dt class="col-sm-3">Tamaño</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Tamano)</dd>
+                <dt class="col-sm-3">Color</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Color)</dd>
 
-                <dt class="col-sm-3">Ejes</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Ejes)</dd>
+                <dt class="col-sm-3">Cliente</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Cliente.Apellidos)</dd>
+
+                <dt class="col-sm-3">Tipo de Vehículo</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.TipoVehiculo.Descripcion)</dd>
             </dl>
 
             <form asp-action="Delete">
-                <input type="hidden" asp-for="Id_Tipo" />
+                <input type="hidden" asp-for="NoPlaca" />
                 <div class="mt-4">
                     <button type="submit" class="btn btn-danger me-2">
                         <i class="bi bi-trash"></i> Eliminar
@@ -40,4 +43,6 @@
                     </a>
                 </div>
             </form>
-</
+        </div>
+    </div>
+</div>

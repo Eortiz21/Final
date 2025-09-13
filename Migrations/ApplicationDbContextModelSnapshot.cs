@@ -253,7 +253,7 @@ namespace Primera.Migrations
 
                     b.HasKey("Id_Cliente");
 
-                    b.ToTable("Clientes");
+                    b.ToTable("Clientes", (string)null);
                 });
 
             modelBuilder.Entity("Primera.Models.EspacioEstacionamiento", b =>
@@ -416,7 +416,7 @@ namespace Primera.Migrations
 
                     b.HasKey("Id_Tipo");
 
-                    b.ToTable("TipoVehiculos");
+                    b.ToTable("TipoVehiculos", (string)null);
                 });
 
             modelBuilder.Entity("Primera.Models.Vehiculo", b =>
@@ -447,7 +447,7 @@ namespace Primera.Migrations
 
                     b.HasIndex("Id_Tipo");
 
-                    b.ToTable("Vehiculos");
+                    b.ToTable("Vehiculos", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -527,7 +527,7 @@ namespace Primera.Migrations
                         .IsRequired();
 
                     b.HasOne("Primera.Models.Vehiculo", "Vehiculo")
-                        .WithMany("Tickets")
+                        .WithMany()
                         .HasForeignKey("NoPlaca")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -581,11 +581,6 @@ namespace Primera.Migrations
             modelBuilder.Entity("Primera.Models.TipoVehiculo", b =>
                 {
                     b.Navigation("Vehiculos");
-                });
-
-            modelBuilder.Entity("Primera.Models.Vehiculo", b =>
-                {
-                    b.Navigation("Tickets");
                 });
 #pragma warning restore 612, 618
         }
