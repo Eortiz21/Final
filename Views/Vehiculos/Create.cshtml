@@ -1,0 +1,76 @@
+﻿@model Primera.Models.Vehiculo
+
+@{
+    ViewData["Title"] = "Crear Vehículo";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Crear Nuevo Vehículo</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="NoPlaca" class="form-label"></label>
+                    <input asp-for="NoPlaca" class="form-control" />
+                    <span asp-validation-for="NoPlaca" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Marca" class="form-label"></label>
+                    <input asp-for="Marca" class="form-control" />
+                    <span asp-validation-for="Marca" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Color" class="form-label"></label>
+                    <input asp-for="Color" class="form-control" />
+                    <span asp-validation-for="Color" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Id_Cliente" class="form-label"></label>
+                    <select asp-for="Id_Cliente" class="form-select" asp-items="ViewBag.Id_Cliente"></select>
+                    <span asp-validation-for="Id_Cliente" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Id_Tipo" class="form-label"></label>
+                    <select asp-for="Id_Tipo" class="form-select" asp-items="ViewBag.Id_Tipo"></select>
+                    <span asp-validation-for="Id_Tipo" class="text-danger"></span>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-plus-circle"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+
+            @* Mostrar errores personalizados desde el controlador *@
+            @if (ViewBag.Errores != null)
+            {
+                <div class="alert alert-danger mt-3">
+                    <ul>
+                        @foreach (var error in ViewBag.Errores)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

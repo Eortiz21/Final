@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Panel de Control</h2>
+
+    <div class="row">
+        <!-- Tarjeta 1 -->
+        <div class="col-md-3">
+            <div class="card text-white bg-primary shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Vehículos</h5>
+                    <p class="card-text">Total registrados: <strong>120</strong></p>
+                    <a asp-controller="Vehiculoes" asp-action="Index" class="btn btn-light btn-sm">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 2 -->
+        <div class="col-md-3">
+            <div class="card text-white bg-success shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Clientes</h5>
+                    <p class="card-text">Activos: <strong>85</strong></p>
+                    <a asp-controller="Clientes" asp-action="Index" class="btn btn-light btn-sm">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 3 -->
+        <div class="col-md-3">
+            <div class="card text-white bg-warning shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Parqueos</h5>
+                    <p class="card-text">Disponibles: <strong>20</strong></p>
+                    <a asp-controller="Parqueos" asp-action="Index" class="btn btn-light btn-sm">Administrar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 4 -->
+        <div class="col-md-3">
+            <div class="card text-white bg-danger shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Alertas</h5>
+                    <p class="card-text">Nuevas: <strong>5</strong></p>
+                    <a asp-controller="Alertas" asp-action="Index" class="btn btn-light btn-sm">Ver alertas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección adicional -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    Últimos Vehículos Registrados
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Toyota Corolla - P123ABC</li>
+                        <li>Honda Civic - P456DEF</li>
+                        <li>Mazda 3 - P789GHI</li>
+                    </ul>
+                    <a asp-controller="Vehiculoes" asp-action="Index" class="btn btn-sm btn-primary">Ver todos</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    Estadísticas
+                </div>
+                <div class="card-body">
+                    <p>Ocupación actual: <strong>75%</strong></p>
+                    <p>Ingresos este mes: <strong>Q 12,500</strong></p>
+                    <p>Clientes nuevos: <strong>10</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

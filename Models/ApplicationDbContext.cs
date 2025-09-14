@@ -17,5 +17,26 @@ namespace Primera.Models
         public DbSet<Pago> Pagos { get; set; } = default!;
         public DbSet<TipoVehiculo> TipoVehiculos { get; set; } = default!;
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Vehiculo>().ToTable("Vehiculos");
+            modelBuilder.Entity<Cliente>().ToTable("Clientes");
+            modelBuilder.Entity<TipoVehiculo>().ToTable("TipoVehiculos");
+
+            modelBuilder.Entity<Vehiculo>()
+                .HasOne(v => v.Cliente)
+                .WithMany(c => c.Vehiculos)
+                .HasForeignKey(v => v.Id_Cliente)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Vehiculo>()
+                .HasOne(v => v.TipoVehiculo)
+                .WithMany(t => t.Vehiculos)
+                .HasForeignKey(v => v.Id_Tipo)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
     }
 }
+

@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 
 public class HomeController : Controller
 {
     public IActionResult Index()
     {
-        // Si el usuario no está autenticado, redirige al login
+        // Si el usuario no está autenticado, redirige al login de Identity
         if (!User.Identity.IsAuthenticated)
         {
-            return RedirectToPage("/Account/Login", new { area = "Identity" });
+            return RedirectToAction("Login", "Account", new { area = "Identity" });
         }
 
         return View();

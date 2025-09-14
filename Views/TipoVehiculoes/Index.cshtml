@@ -1,53 +1,54 @@
 ﻿@model IEnumerable<Primera.Models.TipoVehiculo>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Tipos de Vehículos";
 }
 
-<h1>Index</h1>
+<h1>Tipos de Vehículos</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Crear Nuevo
+    </a>
 </p>
-<table class="table">
+
+<!-- Barra de filtro -->
+<input type="text" id="filterInput" placeholder="Filtrar por descripción, marca, tamaño o ejes..." class="filter-bar" />
+
+<table id="vehiculosTable" class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Descripcion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Marca)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Tamano)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Ejes)
-            </th>
-            <th></th>
+            <th>Descripción</th>
+            <th>Marca</th>
+            <th>Tamaño</th>
+            <th>Ejes</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descripcion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Marca)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Tamano)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ejes)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id_Tipo">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id_Tipo">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id_Tipo">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td data-label="Descripción">@Html.DisplayFor(modelItem => item.Descripcion)</td>
+                <td data-label="Marca">@Html.DisplayFor(modelItem => item.Marca)</td>
+                <td data-label="Tamaño">@Html.DisplayFor(modelItem => item.Tamano)</td>
+                <td data-label="Ejes">@Html.DisplayFor(modelItem => item.Ejes)</td>
+                <td data-label="Acciones">
+                    <a asp-action="Edit" asp-route-id="@item.Id_Tipo" class="btn btn-sm btn-primary me-1">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Id_Tipo" class="btn btn-sm btn-success me-1">
+                        <i class="bi bi-eye"></i> Detalles
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Id_Tipo" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<!-- Reutilizar CSS y JS de Vehiculos -->
+<link rel="stylesheet" href="~/css/vehiculos.css" />
+<script src="~/js/vehiculos.js"></script>

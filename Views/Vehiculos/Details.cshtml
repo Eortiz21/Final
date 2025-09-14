@@ -1,0 +1,40 @@
+﻿@model Primera.Models.Vehiculo
+
+@{
+    ViewData["Title"] = "Detalles del Vehículo";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Detalles del Vehículo</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Placa</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.NoPlaca)</dd>
+
+                <dt class="col-sm-3">Marca</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Marca)</dd>
+
+                <dt class="col-sm-3">Color</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Color)</dd>
+
+                <dt class="col-sm-3">Cliente</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Cliente.Apellidos)</dd>
+
+                <dt class="col-sm-3">Tipo de Vehículo</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.TipoVehiculo.Descripcion)</dd>
+            </dl>
+
+            <div class="mt-4">
+                <a asp-action="Edit" asp-route-id="@Model?.NoPlaca" class="btn btn-primary me-2">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a la lista
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
