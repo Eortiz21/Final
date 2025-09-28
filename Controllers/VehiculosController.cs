@@ -26,11 +26,25 @@ namespace Primera.Controllers
             return View(await vehiculos.ToListAsync());
         }
 
+        // GET: Vehiculos/Details/5
+        public async Task<IActionResult> Details(string id)
+        {
+            if (id == null) return NotFound();
+
+            var vehiculo = await _context.Vehiculos
+                .Include(v => v.Cliente)
+                .Include(v => v.TipoVehiculo)
+                .FirstOrDefaultAsync(v => v.NoPlaca == id);
+
+            if (vehiculo == null) return NotFound();
+
+            return View(vehiculo);
+        }
+
         // GET: Vehiculos/Create
         public IActionResult Create()
         {
-            ViewData["Id_Cliente"] = new SelectList(_context.Clientes, "Id_Cliente", "Apellidos");
-            ViewData["Id_Tipo"] = new SelectList(_context.TipoVehiculos, "Id_Tipo", "Descripcion");
+            LoadSelectLists();
             return View();
         }
 
@@ -49,26 +63,13 @@ namespace Primera.Controllers
                 }
                 catch (DbUpdateException ex)
                 {
-                    ModelState.AddModelError("", $"Error guardando el vehículo: {ex.InnerException?.Message ?? ex.Message}");
+                    // Guardar errores en ViewBag para mostrarlos en la vista
+                    ViewBag.Errores = new string[] { ex.InnerException?.Message ?? ex.Message };
                 }
             }
-            else
-            {
-                // Depurar errores de validación
-                var errores = ModelState.Values.SelectMany(v => v.Errors)
-                                               .Select(e => e.ErrorMessage)
-                                               .ToList();
-                foreach (var error in errores)
-                {
-                    System.Diagnostics.Debug.WriteLine(error); // Aparece en la ventana Output de Visual Studio
-                }
-                ViewBag.Errores = errores; // Para mostrar en la vista si quieres
-            }
 
-            // Recargar los select lists
-            ViewData["Id_Cliente"] = new SelectList(_context.Clientes, "Id_Cliente", "Apellidos", vehiculo.Id_Cliente);
-            ViewData["Id_Tipo"] = new SelectList(_context.TipoVehiculos, "Id_Tipo", "Descripcion", vehiculo.Id_Tipo);
-
+            // Si hay error, recargar los select lists y mantener datos ingresados
+            LoadSelectLists(vehiculo.Id_Cliente, vehiculo.Id_Tipo);
             return View(vehiculo);
         }
 
@@ -80,8 +81,7 @@ namespace Primera.Controllers
             var vehiculo = await _context.Vehiculos.FindAsync(id);
             if (vehiculo == null) return NotFound();
 
-            ViewData["Id_Cliente"] = new SelectList(_context.Clientes, "Id_Cliente", "Apellidos", vehiculo.Id_Cliente);
-            ViewData["Id_Tipo"] = new SelectList(_context.TipoVehiculos, "Id_Tipo", "Descripcion", vehiculo.Id_Tipo);
+            LoadSelectLists(vehiculo.Id_Cliente, vehiculo.Id_Tipo);
             return View(vehiculo);
         }
 
@@ -105,22 +105,14 @@ namespace Primera.Controllers
                     if (!VehiculoExists(vehiculo.NoPlaca)) return NotFound();
                     else throw;
                 }
-            }
-            else
-            {
-                // Depurar errores de validación
-                var errores = ModelState.Values.SelectMany(v => v.Errors)
-                                               .Select(e => e.ErrorMessage)
-                                               .ToList();
-                foreach (var error in errores)
+                catch (DbUpdateException ex)
                 {
-                    System.Diagnostics.Debug.WriteLine(error);
+                    ViewBag.Errores = new string[] { ex.InnerException?.Message ?? ex.Message };
                 }
-                ViewBag.Errores = errores;
             }
 
-            ViewData["Id_Cliente"] = new SelectList(_context.Clientes, "Id_Cliente", "Apellidos", vehiculo.Id_Cliente);
-            ViewData["Id_Tipo"] = new SelectList(_context.TipoVehiculos, "Id_Tipo", "Descripcion", vehiculo.Id_Tipo);
+            // Si hay error de validación, recargar select lists
+            LoadSelectLists(vehiculo.Id_Cliente, vehiculo.Id_Tipo);
             return View(vehiculo);
         }
 
@@ -133,6 +125,7 @@ namespace Primera.Controllers
                 .Include(v => v.Cliente)
                 .Include(v => v.TipoVehiculo)
                 .FirstOrDefaultAsync(v => v.NoPlaca == id);
+
             if (vehiculo == null) return NotFound();
 
             return View(vehiculo);
@@ -157,28 +150,18 @@ namespace Primera.Controllers
             return _context.Vehiculos.Any(e => e.NoPlaca == id);
         }
 
-        // GET: Vehiculoes/Details/5
-        public async Task<IActionResult> Details(string id)
+        // Método para cargar SelectLists de clientes y tipos
+        private void LoadSelectLists(int? clienteId = null, int? tipoId = null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var clientes = _context.Clientes
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id_Cliente.ToString(),
+                    Text = c.NumeroDocumentacion + " - " + c.Nombres + " " + c.Apellidos
+                }).ToList();
 
-            var vehiculo = await _context.Vehiculos
-                .Include(v => v.Cliente)
-                .Include(v => v.TipoVehiculo)
-                .FirstOrDefaultAsync(m => m.NoPlaca == id);
-
-            if (vehiculo == null)
-            {
-                return NotFound();
-            }
-
-            return View(vehiculo);
+            ViewData["Id_Cliente"] = new SelectList(clientes, "Value", "Text", clienteId);
+            ViewData["Id_Tipo"] = new SelectList(_context.TipoVehiculos, "Id_Tipo", "Descripcion", tipoId);
         }
-
-
-
     }
 }

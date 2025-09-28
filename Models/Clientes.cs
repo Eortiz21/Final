@@ -17,6 +17,12 @@ namespace Primera.Models
         [StringLength(100, ErrorMessage = "Los apellidos no pueden exceder 100 caracteres")]
         public string Apellidos { get; set; }
 
+        [Required(ErrorMessage = "Los DPI/Pasaporte")]
+        [StringLength(100, ErrorMessage = "Los apellidos no pueden exceder 100 caracteres")]
+        public string NumeroDocumentacion { get; set; }
+
+
+
         [Required(ErrorMessage = "El teléfono es obligatorio")]
         [Phone(ErrorMessage = "Número de teléfono no válido")]
         public string Telefono { get; set; }
