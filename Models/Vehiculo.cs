@@ -1,35 +1,36 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Primera.Models
 {
+    using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+
     public class Vehiculo
     {
         [Key]
-        [Required]
         [StringLength(20)]
-        public string NoPlaca { get; set; }   // PK según el diagrama
+        [Required(ErrorMessage = "La placa es obligatoria")]
+        public string NoPlaca { get; set; }
 
         [Required(ErrorMessage = "La marca es obligatoria")]
         [StringLength(50)]
-        public string Tipo_Vehiculo { get; set; }
-
         public string Marca { get; set; }
 
         [Required(ErrorMessage = "El color es obligatorio")]
         [StringLength(30)]
         public string Color { get; set; }
 
-        // Relación con Cliente
-        [Required]
+        [Required(ErrorMessage = "Debe seleccionar un cliente")]
         public int Id_Cliente { get; set; }
+
+        [ValidateNever]   // 👈 evita que el binder intente validar Cliente
         public Cliente Cliente { get; set; }
 
-        // Relación con TipoVehiculo
-        public ICollection<TipoVehiculo> TiposVehiculo { get; set; } = new List<TipoVehiculo>();
+        [Required(ErrorMessage = "Debe seleccionar un tipo de vehículo")]
+        public int Id_Tipo { get; set; }
 
-        // Relación con Ticket
-        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+        [ValidateNever]   // 👈 evita que el binder intente validar TipoVehiculo
+        public TipoVehiculo TipoVehiculo { get; set; }
     }
+
 }

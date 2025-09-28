@@ -253,7 +253,7 @@ namespace Primera.Migrations
 
                     b.HasKey("Id_Cliente");
 
-                    b.ToTable("Clientes");
+                    b.ToTable("Clientes", (string)null);
                 });
 
             modelBuilder.Entity("Primera.Models.EspacioEstacionamiento", b =>
@@ -401,18 +401,22 @@ namespace Primera.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("Id_Tarifa")
-                        .HasMaxLength(20)
+                    b.Property<int>("Ejes")
                         .HasColumnType("int");
 
-                    b.Property<int>("TarifaId_Tarifa")
-                        .HasColumnType("int");
+                    b.Property<string>("Marca")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Tamano")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id_Tipo");
 
-                    b.HasIndex("TarifaId_Tarifa");
-
-                    b.ToTable("TipoVehiculos");
+                    b.ToTable("TipoVehiculos", (string)null);
                 });
 
             modelBuilder.Entity("Primera.Models.Vehiculo", b =>
@@ -420,9 +424,6 @@ namespace Primera.Migrations
                     b.Property<string>("NoPlaca")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("ClienteId_Cliente")
-                        .HasColumnType("int");
 
                     b.Property<string>("Color")
                         .IsRequired()
@@ -432,35 +433,21 @@ namespace Primera.Migrations
                     b.Property<int>("Id_Cliente")
                         .HasColumnType("int");
 
-                    b.Property<string>("Marca")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Id_Tipo")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Tipo_Vehiculo")
+                    b.Property<string>("Marca")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("NoPlaca");
 
-                    b.HasIndex("ClienteId_Cliente");
+                    b.HasIndex("Id_Cliente");
 
-                    b.ToTable("Vehiculos");
-                });
+                    b.HasIndex("Id_Tipo");
 
-            modelBuilder.Entity("TipoVehiculoVehiculo", b =>
-                {
-                    b.Property<int>("TiposVehiculoId_Tipo")
-                        .HasColumnType("int");
-
-                    b.Property<string>("VehiculosNoPlaca")
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("TiposVehiculoId_Tipo", "VehiculosNoPlaca");
-
-                    b.HasIndex("VehiculosNoPlaca");
-
-                    b.ToTable("TipoVehiculoVehiculo");
+                    b.ToTable("Vehiculos", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -540,7 +527,7 @@ namespace Primera.Migrations
                         .IsRequired();
 
                     b.HasOne("Primera.Models.Vehiculo", "Vehiculo")
-                        .WithMany("Tickets")
+                        .WithMany()
                         .HasForeignKey("NoPlaca")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -552,41 +539,23 @@ namespace Primera.Migrations
                     b.Navigation("Vehiculo");
                 });
 
-            modelBuilder.Entity("Primera.Models.TipoVehiculo", b =>
-                {
-                    b.HasOne("Primera.Models.Tarifa", "Tarifa")
-                        .WithMany()
-                        .HasForeignKey("TarifaId_Tarifa")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tarifa");
-                });
-
             modelBuilder.Entity("Primera.Models.Vehiculo", b =>
                 {
                     b.HasOne("Primera.Models.Cliente", "Cliente")
                         .WithMany("Vehiculos")
-                        .HasForeignKey("ClienteId_Cliente")
+                        .HasForeignKey("Id_Cliente")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Primera.Models.TipoVehiculo", "TipoVehiculo")
+                        .WithMany("Vehiculos")
+                        .HasForeignKey("Id_Tipo")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cliente");
-                });
 
-            modelBuilder.Entity("TipoVehiculoVehiculo", b =>
-                {
-                    b.HasOne("Primera.Models.TipoVehiculo", null)
-                        .WithMany()
-                        .HasForeignKey("TiposVehiculoId_Tipo")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Primera.Models.Vehiculo", null)
-                        .WithMany()
-                        .HasForeignKey("VehiculosNoPlaca")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("TipoVehiculo");
                 });
 
             modelBuilder.Entity("Primera.Models.Cliente", b =>
@@ -609,9 +578,9 @@ namespace Primera.Migrations
                     b.Navigation("Pagos");
                 });
 
-            modelBuilder.Entity("Primera.Models.Vehiculo", b =>
+            modelBuilder.Entity("Primera.Models.TipoVehiculo", b =>
                 {
-                    b.Navigation("Tickets");
+                    b.Navigation("Vehiculos");
                 });
 #pragma warning restore 612, 618
         }
