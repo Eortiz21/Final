@@ -12,8 +12,8 @@ using Primera.Models;
 namespace Primera.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250913030746_IdentityInitial")]
-    partial class IdentityInitial
+    [Migration("20250929020148_Baseline")]
+    partial class Baseline
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -246,6 +246,11 @@ namespace Primera.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Nombres")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NumeroDocumentacion")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");

@@ -5,7 +5,7 @@
 namespace Primera.Migrations
 {
     /// <inheritdoc />
-    public partial class uno : Migration
+    public partial class Baseli : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

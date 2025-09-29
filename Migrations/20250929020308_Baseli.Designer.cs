@@ -12,8 +12,8 @@ using Primera.Models;
 namespace Primera.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250928231216_clientedpi")]
-    partial class clientedpi
+    [Migration("20250929020308_Baseli")]
+    partial class Baseli
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
