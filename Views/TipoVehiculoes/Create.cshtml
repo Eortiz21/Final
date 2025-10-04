@@ -101,6 +101,31 @@
     </div>
 </div>
 
+
+
+<script>
+    const searchInput = document.getElementById("searchInput");
+    const selectDescripcion = document.querySelector("select[asp-for='Descripcion']");
+    const inputMarca = document.querySelector("input[asp-for='Marca']"); // o 'select' si es select
+    const originalOptions = Array.from(selectDescripcion.options);
+
+    searchInput.addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        selectDescripcion.innerHTML = "";
+
+        originalOptions.forEach(option => {
+            const descripcion = option.text.toLowerCase();
+            const marca = inputMarca.value.toLowerCase();
+            // Mostrar opción si coincide con el filtro o es placeholder
+            if ((descripcion.includes(filter) || marca.includes(filter)) || option.value === "") {
+                selectDescripcion.appendChild(option);
+            }
+        });
+    });
+</script>
+
+</script>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

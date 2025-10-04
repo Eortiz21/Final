@@ -47,6 +47,32 @@
         }
     </tbody>
 </table>
+<script>
+    const filterInput = document.getElementById("filterInput");
+    const rows = document.querySelectorAll("#clientesTable tbody tr"); // todas las filas de la tabla
+
+    filterInput.addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+
+        rows.forEach(row => {
+            const nombres = row.cells[0].textContent.toLowerCase();
+            const apellidos = row.cells[1].textContent.toLowerCase();
+            const documento = row.cells[2].textContent.toLowerCase();
+            const telefono = row.cells[3].textContent.toLowerCase();
+
+            if (
+                nombres.includes(filter) ||
+                apellidos.includes(filter) ||
+                documento.includes(filter) ||
+                telefono.includes(filter)
+            ) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+</script>
 
 <link rel="stylesheet" href="~/css/vehiculos.css" />
 <script src="~/js/vehiculos.js"></script>

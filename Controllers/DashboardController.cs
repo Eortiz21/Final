@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Primera.Models;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Primera.Controllers
 {
@@ -16,58 +18,83 @@ namespace Primera.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Datos principales
+            // KPIs básicos
             var totalVehiculos = await _context.Vehiculos.CountAsync();
             var totalClientes = await _context.Clientes.CountAsync();
             var totalEspacios = await _context.EspacioEstacionamientos.CountAsync();
             var ocupados = await _context.EspacioEstacionamientos.CountAsync(e => e.Estado == "Ocupado");
             var disponibles = totalEspacios - ocupados;
 
-            // Últimos 5 vehículos registrados (ordenados por placa de ejemplo)
+            // Últimos 5 vehículos registrados
             var ultimosVehiculos = await _context.Vehiculos
+                .Include(v => v.TipoVehiculo)
+                .Include(v => v.Cliente)
                 .OrderByDescending(v => v.NoPlaca)
                 .Take(5)
-                .Include(v => v.Cliente)
-                .Include(v => v.TipoVehiculo)
                 .ToListAsync();
 
-            // Vehículos agrupados por tipo
+            // Vehículos por tipo
             var vehiculosPorTipo = await _context.Vehiculos
                 .Include(v => v.TipoVehiculo)
-                .GroupBy(v => v.TipoVehiculo.Descripcion) // 👈 NombreTipo debe existir en tu modelo TipoVehiculo
+                .GroupBy(v => v.TipoVehiculo.Descripcion)
                 .Select(g => new { Tipo = g.Key, Cantidad = g.Count() })
                 .ToListAsync();
+
+            // Vehículos parqueados por tipo (más populares)
+            var vehiculoMasParqueado = await _context.Tickets
+                .Include(t => t.Vehiculo)
+                .ThenInclude(v => v.TipoVehiculo)
+                .GroupBy(t => t.Vehiculo.TipoVehiculo.Descripcion)
+                .Select(g => new { Tipo = g.Key, Cantidad = g.Count() })
+                .OrderByDescending(g => g.Cantidad)
+                .FirstOrDefaultAsync();
+
+            // Clientes por día últimos 7 días
+            var fechaInicio = DateTime.Now.AddDays(-6);
+            var clientesPorDia = await _context.Tickets
+                .Where(t => t.Fecha_hora_entrada >= fechaInicio)
+                .GroupBy(t => t.Fecha_hora_entrada.Date)
+                .Select(g => new { Dia = g.Key, Cantidad = g.Select(t => t.Vehiculo.Id_Cliente).Distinct().Count() })
+                .ToListAsync();
+
+            // Dinero ganado por día últimos 7 días
+            var dineroPorDia = await _context.Tickets
+                .Where(t => t.Fecha_hora_salida != null && t.Fecha_hora_entrada >= fechaInicio)
+                .GroupBy(t => t.Fecha_hora_salida.Value.Date)
+                .Select(g => new { Dia = g.Key, Total = g.Sum(t => t.PagoTotal) })
+                .ToListAsync();
+
+            // Preparar listas de días
+            var dias = Enumerable.Range(0, 7)
+                .Select(i => fechaInicio.AddDays(i).ToString("dd/MM"))
+                .ToList();
+
+            var clientesPorDiaData = dias.Select(d => clientesPorDia.FirstOrDefault(c => c.Dia.ToString("dd/MM") == d)?.Cantidad ?? 0).ToList();
+            var dineroPorDiaData = dias.Select(d => dineroPorDia.FirstOrDefault(c => c.Dia.ToString("dd/MM") == d)?.Total ?? 0).ToList();
+
+            // Tickets activos vs pagados
+            var ticketsActivos = await _context.Tickets.CountAsync(t => t.Fecha_hora_salida == null);
+            var ticketsPagados = await _context.Tickets.CountAsync(t => t.Fecha_hora_salida != null && t.PagoTotal > 0);
+
+            // Guardar en ViewData
+            ViewData["TotalVehiculos"] = totalVehiculos;
+            ViewData["TotalClientes"] = totalClientes;
+            ViewData["TotalEspacios"] = totalEspacios;
+            ViewData["Ocupados"] = ocupados;
+            ViewData["Disponibles"] = disponibles;
+            ViewData["UltimosVehiculos"] = ultimosVehiculos;
 
             ViewData["VehiculosPorTipoLabels"] = vehiculosPorTipo.Select(v => v.Tipo).ToList();
             ViewData["VehiculosPorTipoData"] = vehiculosPorTipo.Select(v => v.Cantidad).ToList();
 
-            // Ocupación
-            ViewData["Ocupados"] = ocupados;
-            ViewData["Disponibles"] = disponibles;
+            ViewData["VehiculoMasParqueado"] = vehiculoMasParqueado?.Tipo ?? "N/A";
 
-            // Ingresos mensuales (últimos 6 meses)
-            var ingresos = await _context.Pagos
-                .GroupBy(p => new { p.FechaPago.Year, p.FechaPago.Month })
-                .Select(g => new {
-                    Mes = g.Key.Month,
-                    Anio = g.Key.Year,
-                    Total = g.Sum(p => p.MontoPago) // 👈 ahora usa MontoPago
-                })
-                .OrderBy(g => g.Anio).ThenBy(g => g.Mes)
-                .Take(6)
-                .ToListAsync();
+            ViewData["Dias"] = dias;
+            ViewData["ClientesPorDiaData"] = clientesPorDiaData;
+            ViewData["DineroPorDiaData"] = dineroPorDiaData;
 
-            var meses = ingresos.Select(i => $"{i.Mes}/{i.Anio}").ToList();
-            var valores = ingresos.Select(i => i.Total).ToList();
-
-            ViewData["MesesIngresos"] = meses;
-            ViewData["IngresosMensuales"] = valores;
-
-            // Datos para tarjetas y listas
-            ViewData["TotalVehiculos"] = totalVehiculos;
-            ViewData["TotalClientes"] = totalClientes;
-            ViewData["TotalEspacios"] = totalEspacios;
-            ViewData["UltimosVehiculos"] = ultimosVehiculos ?? new List<Vehiculo>();
+            ViewData["TicketsActivos"] = ticketsActivos;
+            ViewData["TicketsPagados"] = ticketsPagados;
 
             return View();
         }

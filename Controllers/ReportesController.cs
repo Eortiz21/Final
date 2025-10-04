@@ -19,14 +19,6 @@ namespace Primera.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        // ==============================
-        // Exportar Excel
-        // ==============================
         [HttpPost]
         public IActionResult ExportarExcel(string graficoVehiculos, string graficoOcupacion, string graficoClientes)
         {
@@ -35,77 +27,62 @@ namespace Primera.Controllers
 
             using (var workbook = new XLWorkbook())
             {
-                // ----------------- Hoja Vehículos -----------------
-                var wsVehiculos = workbook.Worksheets.Add("Vehículos");
-                wsVehiculos.Cell("A1").Value = "Reporte de Vehículos";
-                wsVehiculos.Range("A1:D1").Merge().Style
-                    .Font.SetBold().Font.FontSize = 14;
-                wsVehiculos.Range("A1:D1").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
-                wsVehiculos.Cell(2, 1).Value = "Placa";
-                wsVehiculos.Cell(2, 2).Value = "Marca";
-                wsVehiculos.Cell(2, 3).Value = "Color";
-                wsVehiculos.Cell(2, 4).Value = "Tipo";
+                // Hoja Vehículos
+                var wsVeh = workbook.Worksheets.Add("Vehículos");
+                wsVeh.Cell("A1").Value = "Reporte de Vehículos";
+                wsVeh.Range("A1:D1").Merge().Style.Font.SetBold().Font.FontSize = 14;
+                wsVeh.Range("A1:D1").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                wsVeh.Cell(2, 1).Value = "Placa"; wsVeh.Cell(2, 2).Value = "Marca";
+                wsVeh.Cell(2, 3).Value = "Color"; wsVeh.Cell(2, 4).Value = "Tipo";
 
                 int row = 3;
                 foreach (var v in vehiculos)
                 {
-                    wsVehiculos.Cell(row, 1).Value = v.NoPlaca;
-                    wsVehiculos.Cell(row, 2).Value = v.Marca;
-                    wsVehiculos.Cell(row, 3).Value = v.Color;
-                    wsVehiculos.Cell(row, 4).Value = v.TipoVehiculo?.Descripcion;
+                    wsVeh.Cell(row, 1).Value = v.NoPlaca;
+                    wsVeh.Cell(row, 2).Value = v.Marca;
+                    wsVeh.Cell(row, 3).Value = v.Color;
+                    wsVeh.Cell(row, 4).Value = v.TipoVehiculo?.Descripcion;
                     row++;
                 }
+                wsVeh.Range(2, 1, row - 1, 4).CreateTable().Theme = XLTableTheme.TableStyleMedium9;
+                wsVeh.Columns().AdjustToContents();
 
-                var tblVehiculos = wsVehiculos.Range(2, 1, row - 1, 4).CreateTable();
-                tblVehiculos.Theme = XLTableTheme.TableStyleMedium9;
-                wsVehiculos.Columns().AdjustToContents();
-
-                // ----------------- Hoja Espacios -----------------
-                var wsEspacios = workbook.Worksheets.Add("Espacios");
-                wsEspacios.Cell("A1").Value = "Reporte de Espacios";
-                wsEspacios.Range("A1:E1").Merge().Style
-                    .Font.SetBold().Font.FontSize = 14;
-                wsEspacios.Range("A1:E1").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-
-                wsEspacios.Cell(2, 1).Value = "ID";
-                wsEspacios.Cell(2, 2).Value = "Número";
-                wsEspacios.Cell(2, 3).Value = "Nivel";
-                wsEspacios.Cell(2, 4).Value = "Tipo";
-                wsEspacios.Cell(2, 5).Value = "Estado";
+                // Hoja Espacios
+                var wsEsp = workbook.Worksheets.Add("Espacios");
+                wsEsp.Cell("A1").Value = "Reporte de Espacios";
+                wsEsp.Range("A1:E1").Merge().Style.Font.SetBold().Font.FontSize = 14;
+                wsEsp.Range("A1:E1").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                wsEsp.Cell(2, 1).Value = "ID"; wsEsp.Cell(2, 2).Value = "Número";
+                wsEsp.Cell(2, 3).Value = "Nivel"; wsEsp.Cell(2, 4).Value = "Tipo"; wsEsp.Cell(2, 5).Value = "Estado";
 
                 row = 3;
                 foreach (var e in espacios)
                 {
-                    wsEspacios.Cell(row, 1).Value = e.Id_Espacio;
-                    wsEspacios.Cell(row, 2).Value = e.No_Espacio;
-                    wsEspacios.Cell(row, 3).Value = e.Nivel;
-                    wsEspacios.Cell(row, 4).Value = e.TipoEspacio;
-                    wsEspacios.Cell(row, 5).Value = e.Estado;
+                    wsEsp.Cell(row, 1).Value = e.Id_Espacio;
+                    wsEsp.Cell(row, 2).Value = e.No_Espacio;
+                    wsEsp.Cell(row, 3).Value = e.Nivel;
+                    wsEsp.Cell(row, 4).Value = e.TipoEspacio;
+                    wsEsp.Cell(row, 5).Value = e.Estado;
                     row++;
                 }
+                wsEsp.Range(2, 1, row - 1, 5).CreateTable().Theme = XLTableTheme.TableStyleMedium2;
+                wsEsp.Columns().AdjustToContents();
 
-                var tblEspacios = wsEspacios.Range(2, 1, row - 1, 5).CreateTable();
-                tblEspacios.Theme = XLTableTheme.TableStyleMedium2;
-                wsEspacios.Columns().AdjustToContents();
-
-                // ----------------- Hoja Dashboard -----------------
+                // Hoja Dashboard con gráficos
                 var wsDash = workbook.Worksheets.Add("Dashboard");
-                wsDash.Cell("A1").Value = "Dashboard de Reportes";
-                wsDash.Range("A1:C1").Merge().Style
-                    .Font.SetBold().Font.FontSize = 16;
+                wsDash.Cell("A1").Value = "Dashboard AutoManager";
+                wsDash.Range("A1:C1").Merge().Style.Font.SetBold().Font.FontSize = 16;
                 wsDash.Range("A1:C1").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
                 int imgRow = 3;
-
                 void InsertarGrafico(string base64, string titulo)
                 {
                     if (!string.IsNullOrEmpty(base64))
                     {
-                        var imgBytes = Convert.FromBase64String(base64.Split(',')[1]);
-                        using (var ms = new MemoryStream(imgBytes))
+                        var bytes = Convert.FromBase64String(base64.Split(',')[1]);
+                        using (var ms = new MemoryStream(bytes))
                         {
-                            var pic = wsDash.AddPicture(ms).MoveTo(wsDash.Cell(imgRow, 1));
+                            wsDash.AddPicture(ms).MoveTo(wsDash.Cell(imgRow, 1));
                             wsDash.Cell(imgRow - 1, 1).Value = titulo;
                             wsDash.Cell(imgRow - 1, 1).Style.Font.SetBold();
                             imgRow += 20;
@@ -114,23 +91,19 @@ namespace Primera.Controllers
                 }
 
                 InsertarGrafico(graficoVehiculos, "Vehículos por Tipo");
-                InsertarGrafico(graficoOcupacion, "Ocupación de Parqueos");
-                InsertarGrafico(graficoClientes, "Clientes Diarios");
+                InsertarGrafico(graficoOcupacion, "Dinero Ganado");
+                InsertarGrafico(graficoClientes, "Clientes Últimos 7 Días");
 
                 using (var stream = new MemoryStream())
                 {
                     workbook.SaveAs(stream);
-                    stream.Position = 0;
                     return File(stream.ToArray(),
-                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                "ReporteCompleto.xlsx");
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "ReporteCompleto.xlsx");
                 }
             }
         }
 
-        // ==============================
-        // Exportar PDF
-        // ==============================
         [HttpPost]
         public IActionResult ExportarPdf(string graficoVehiculos, string graficoOcupacion, string graficoClientes)
         {
@@ -139,34 +112,28 @@ namespace Primera.Controllers
 
             using (var stream = new MemoryStream())
             {
-                var document = new Document(PageSize.A4, 40, 40, 50, 50);
-                var writer = PdfWriter.GetInstance(document, stream);
-
-                // Pie de página
+                var doc = new Document(PageSize.A4, 40, 40, 50, 50);
+                var writer = PdfWriter.GetInstance(doc, stream);
                 writer.PageEvent = new PdfFooter();
-
-                document.Open();
+                doc.Open();
 
                 // Portada
-                document.Add(new Paragraph("AutoManager - Reporte General", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD)));
-                document.Add(new Paragraph("Fecha: " + DateTime.Now.ToString("dd/MM/yyyy"), new Font(Font.FontFamily.HELVETICA, 12)));
-                document.Add(new Paragraph(" "));
-                document.Add(new LineSeparator());
+                doc.Add(new Paragraph("AutoManager - Reporte General", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD)));
+                doc.Add(new Paragraph("Fecha: " + DateTime.Now.ToString("dd/MM/yyyy")));
+                doc.Add(new Paragraph(" "));
+                doc.Add(new LineSeparator());
 
-                // Sección Vehículos
-                document.Add(new Paragraph("\nVehículos", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+                // Vehículos
+                doc.Add(new Paragraph("\nVehículos", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
                 PdfPTable tablaVeh = new PdfPTable(4) { WidthPercentage = 100 };
                 tablaVeh.SetWidths(new float[] { 20, 30, 20, 30 });
                 string[] headersVeh = { "Placa", "Marca", "Color", "Tipo" };
-
                 foreach (var h in headersVeh)
                 {
-                    var celda = new PdfPCell(new Phrase(h, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.WHITE)));
-                    celda.BackgroundColor = new BaseColor(0, 102, 204);
-                    celda.HorizontalAlignment = Element.ALIGN_CENTER;
-                    tablaVeh.AddCell(celda);
+                    var c = new PdfPCell(new Phrase(h, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.WHITE)));
+                    c.BackgroundColor = new BaseColor(0, 102, 204); c.HorizontalAlignment = Element.ALIGN_CENTER;
+                    tablaVeh.AddCell(c);
                 }
-
                 foreach (var v in vehiculos)
                 {
                     tablaVeh.AddCell(v.NoPlaca);
@@ -174,22 +141,19 @@ namespace Primera.Controllers
                     tablaVeh.AddCell(v.Color);
                     tablaVeh.AddCell(v.TipoVehiculo?.Descripcion ?? "N/A");
                 }
-                document.Add(tablaVeh);
+                doc.Add(tablaVeh);
 
-                // Sección Espacios
-                document.Add(new Paragraph("\nEspacios de Parqueo", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+                // Espacios
+                doc.Add(new Paragraph("\nEspacios de Parqueo", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
                 PdfPTable tablaEsp = new PdfPTable(5) { WidthPercentage = 100 };
                 tablaEsp.SetWidths(new float[] { 10, 20, 20, 25, 25 });
                 string[] headersEsp = { "ID", "Número", "Nivel", "Tipo", "Estado" };
-
                 foreach (var h in headersEsp)
                 {
-                    var celda = new PdfPCell(new Phrase(h, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.WHITE)));
-                    celda.BackgroundColor = new BaseColor(0, 153, 76);
-                    celda.HorizontalAlignment = Element.ALIGN_CENTER;
-                    tablaEsp.AddCell(celda);
+                    var c = new PdfPCell(new Phrase(h, new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.WHITE)));
+                    c.BackgroundColor = new BaseColor(0, 153, 76); c.HorizontalAlignment = Element.ALIGN_CENTER;
+                    tablaEsp.AddCell(c);
                 }
-
                 foreach (var e in espacios)
                 {
                     tablaEsp.AddCell(e.Id_Espacio.ToString());
@@ -198,45 +162,40 @@ namespace Primera.Controllers
                     tablaEsp.AddCell(e.TipoEspacio);
                     tablaEsp.AddCell(e.Estado);
                 }
-                document.Add(tablaEsp);
+                doc.Add(tablaEsp);
 
-                // Sección Gráficas
+                // Gráficos
                 void InsertarGrafico(string base64, string titulo)
                 {
                     if (!string.IsNullOrEmpty(base64))
                     {
-                        document.NewPage();
-                        document.Add(new Paragraph(titulo, new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
-                        var imgBytes = Convert.FromBase64String(base64.Split(',')[1]);
-                        var chartImage = iTextSharp.text.Image.GetInstance(imgBytes);
-                        chartImage.ScaleToFit(450f, 300f);
-                        chartImage.Alignment = Element.ALIGN_CENTER;
-                        document.Add(chartImage);
+                        doc.NewPage();
+                        doc.Add(new Paragraph(titulo, new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+                        var bytes = Convert.FromBase64String(base64.Split(',')[1]);
+                        var img = iTextSharp.text.Image.GetInstance(bytes);
+                        img.ScaleToFit(450f, 300f);
+                        img.Alignment = Element.ALIGN_CENTER;
+                        doc.Add(img);
                     }
                 }
 
                 InsertarGrafico(graficoVehiculos, "Gráfico: Vehículos por Tipo");
-                InsertarGrafico(graficoOcupacion, "Gráfico: Ocupación de Parqueos");
-                InsertarGrafico(graficoClientes, "Gráfico: Clientes Diarios");
+                InsertarGrafico(graficoOcupacion, "Gráfico: Dinero Ganado");
+                InsertarGrafico(graficoClientes, "Gráfico: Clientes Últimos 7 Días");
 
-                document.Close();
-
+                doc.Close();
                 return File(stream.ToArray(), "application/pdf", "ReporteCompleto.pdf");
             }
         }
     }
 
-    // Clase para pie de página
     public class PdfFooter : PdfPageEventHelper
     {
         public override void OnEndPage(PdfWriter writer, Document document)
         {
             var font = new Font(Font.FontFamily.HELVETICA, 10, Font.ITALIC);
             var footer = new Phrase("Página " + writer.PageNumber, font);
-
-            var cb = writer.DirectContent;
-            ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER, footer,
-                (document.Right + document.Left) / 2, document.Bottom - 10, 0);
+            ColumnText.ShowTextAligned(writer.DirectContent, Element.ALIGN_CENTER, footer, (document.Right + document.Left) / 2, document.Bottom - 10, 0);
         }
     }
 }
