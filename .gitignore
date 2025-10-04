@@ -1,3 +1,9 @@
 /.vs
 /obj
 bin/Debug/net8.0/appsettings.json
+*.json
+*.json
+*.json
+*.json
+*.json
+bin/Debug/net8.0/Primera.staticwebassets.endpoints.json

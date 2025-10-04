@@ -1,59 +1,65 @@
 ﻿@model IEnumerable<Primera.Models.Pago>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Pagos";
 }
 
-<h1>Index</h1>
+<h1>Pagos</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Crear Nuevo Pago
+    </a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Ticket)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MontoPago)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaPago)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MetodoPago)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EstadoPago)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ticket.NoPlaca)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MontoPago)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FechaPago)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MetodoPago)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EstadoPago)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id_Pago">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id_Pago">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id_Pago">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+<!-- Barra de filtro -->
+<input type="text" id="filterInput" placeholder="Filtrar por ticket, método o estado..." class="form-control mb-3" />
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Ticket: @item.Ticket.NoPlaca</h5>
+                    <p class="card-text"><strong>Monto:</strong> @item.MontoPago.ToString("C")</p>
+                    <p class="card-text"><strong>Fecha:</strong> @item.FechaPago.ToString("yyyy-MM-dd")</p>
+                    <p class="card-text"><strong>Método:</strong> @item.MetodoPago</p>
+                    <p class="card-text"><strong>Estado:</strong> @item.EstadoPago</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-action="Edit" asp-route-id="@item.Id_Pago" class="btn btn-sm btn-primary">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Id_Pago" class="btn btn-sm btn-success">
+                        <i class="bi bi-eye"></i> Detalles
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Id_Pago" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    @if (!Model.Any())
+    {
+        <div class="col-12 text-center">
+            <p>No hay pagos registrados.</p>
+        </div>
+    }
+</div>
+
+<!-- Script para barra de búsqueda -->
+<script>
+    const filterInput = document.getElementById('filterInput');
+    filterInput.addEventListener('keyup', function () {
+        const filter = filterInput.value.toLowerCase();
+        const cards = document.querySelectorAll('.row .col-md-4');
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            card.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+
+<link rel="stylesheet" href="~/css/vehiculos.css" />

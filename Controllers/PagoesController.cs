@@ -58,6 +58,13 @@ namespace Primera.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id_Pago,Id_Ticket,MontoPago,FechaPago,MetodoPago,EstadoPago")] Pago pago)
         {
+            if (!ModelState.IsValid)
+            {
+                // Aquí puedes inspeccionar errores
+                var errores = string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                Console.WriteLine("Errores: " + errores);
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(pago);

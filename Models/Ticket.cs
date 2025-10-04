@@ -10,34 +10,32 @@ namespace Primera.Models
         [Key]
         public int Id_Ticket { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La placa es obligatoria.")]
         [StringLength(20)]
-        public string NoPlaca { get; set; }
+        public string NoPlaca { get; set; } = string.Empty;
 
         // Relación con Vehiculo usando NoPlaca como FK
         [ForeignKey(nameof(NoPlaca))]
-        public Vehiculo Vehiculo { get; set; }
+        public Vehiculo? Vehiculo { get; set; }   // 🔥 Ya no required, se carga después
 
-        // Relación con EspacioEstacionamiento usando Id_Espacio como FK
-        [Required]
+        [Required(ErrorMessage = "El espacio es obligatorio.")]
         public int Id_Espacio { get; set; }
 
         [ForeignKey(nameof(Id_Espacio))]
-        public EspacioEstacionamiento EspacioEstacionamiento { get; set; }
+        public EspacioEstacionamiento? EspacioEstacionamiento { get; set; }  // 🔥 Ya no required
 
-        [Required]
+        [Required(ErrorMessage = "La fecha de entrada es obligatoria.")]
         public DateTime Fecha_hora_entrada { get; set; }
 
         public DateTime? Fecha_hora_salida { get; set; }
 
-        // Relación con Tarifa
-        [Required]
+        [Required(ErrorMessage = "La tarifa es obligatoria.")]
         public int Id_Tarifa { get; set; }
 
         [ForeignKey(nameof(Id_Tarifa))]
-        public Tarifa Tarifa { get; set; }
+        public Tarifa? Tarifa { get; set; }   // 🔥 Ya no required
 
-        [Required]
+        [Required(ErrorMessage = "El pago total es obligatorio.")]
         [Column(TypeName = "decimal(18,2)")]
         public decimal PagoTotal { get; set; }
 
