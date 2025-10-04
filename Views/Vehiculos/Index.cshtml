@@ -33,8 +33,13 @@
                     <td data-label="Placa">@item.NoPlaca</td>
                     <td data-label="Marca">@item.Marca</td>
                     <td data-label="Color">@item.Color</td>
-                    <td data-label="Cliente">@item.Cliente.Apellidos</td>
-                    <td data-label="Tipo Vehículo">@item.TipoVehiculo.Descripcion</td>
+                    <td data-label="Cliente">
+                        @if (item.Cliente != null)
+                        {
+                            @($"{item.Cliente.NumeroDocumentacion} - {item.Cliente.Nombres} {item.Cliente.Apellidos}")
+                        }
+                    </td>
+                    <td data-label="Tipo Vehículo">@item.TipoVehiculo?.Descripcion</td>
                     <td data-label="Acciones">
                         <a asp-action="Edit" asp-route-id="@item.NoPlaca" class="btn btn-sm btn-primary me-1">
                             <i class="bi bi-pencil"></i> Editar

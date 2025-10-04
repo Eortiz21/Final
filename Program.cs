@@ -25,6 +25,11 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 // Construye la aplicación web con toda la configuración previa
 var app = builder.Build();
 
+
+
+
+
+
 // Configuración del pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {

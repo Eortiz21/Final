@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Primera.Models;
 
@@ -49,11 +48,9 @@ namespace Primera.Controllers
         }
 
         // POST: Clientes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id_Cliente,Nombres,Apellidos,Telefono,Direccion")] Cliente cliente)
+        public async Task<IActionResult> Create([Bind("Id_Cliente,Nombres,Apellidos,NumeroDocumentacion,Telefono,Direccion")] Cliente cliente)
         {
             if (ModelState.IsValid)
             {
@@ -81,11 +78,9 @@ namespace Primera.Controllers
         }
 
         // POST: Clientes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id_Cliente,Nombres,Apellidos,Telefono,Direccion")] Cliente cliente)
+        public async Task<IActionResult> Edit(int id, [Bind("Id_Cliente,Nombres,Apellidos,NumeroDocumentacion,Telefono,Direccion")] Cliente cliente)
         {
             if (id != cliente.Id_Cliente)
             {

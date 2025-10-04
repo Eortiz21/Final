@@ -27,6 +27,13 @@
                 </div>
 
                 <div class="mb-3">
+                    <label asp-for="NumeroDocumentacion" class="form-label"></label>
+                    <input asp-for="NumeroDocumentacion" class="form-control" />
+                    <span asp-validation-for="NumeroDocumentacion" class="text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
                     <label asp-for="Telefono" class="form-label"></label>
                     <input asp-for="Telefono" class="form-control" />
                     <span asp-validation-for="Telefono" class="text-danger"></span>
