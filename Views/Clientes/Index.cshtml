@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Primera.Models.Cliente>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Clientes";
 }
 
 <h1>Clientes</h1>
@@ -10,14 +10,14 @@
     <a asp-action="Create" class="btn btn-primary">Crear Nuevo</a>
 </p>
 
-<!-- Barra de filtro -->
-<input type="text" id="filterInput" placeholder="Filtrar por nombre, apellido o teléfono..." class="filter-bar" />
+<input type="text" id="filterInput" placeholder="Filtrar por nombre, apellido, documento o teléfono..." class="filter-bar" />
 
-<table id="vehiculosTable" class="table">
+<table id="clientesTable" class="table">
     <thead>
         <tr>
             <th>Nombres</th>
             <th>Apellidos</th>
+            <th>DPI/PASAPORTE</th>
             <th>Teléfono</th>
             <th>Dirección</th>
             <th>Acciones</th>
@@ -29,6 +29,7 @@
             <tr>
                 <td data-label="Nombres">@Html.DisplayFor(modelItem => item.Nombres)</td>
                 <td data-label="Apellidos">@Html.DisplayFor(modelItem => item.Apellidos)</td>
+                <td data-label="NumeroDocumentacion">@Html.DisplayFor(modelItem => item.NumeroDocumentacion)</td>
                 <td data-label="Teléfono">@Html.DisplayFor(modelItem => item.Telefono)</td>
                 <td data-label="Dirección">@Html.DisplayFor(modelItem => item.Direccion)</td>
                 <td data-label="Acciones">
@@ -46,7 +47,32 @@
         }
     </tbody>
 </table>
+<script>
+    const filterInput = document.getElementById("filterInput");
+    const rows = document.querySelectorAll("#clientesTable tbody tr"); // todas las filas de la tabla
 
-<!-- Reutilizar CSS y JS de Vehiculos -->
+    filterInput.addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+
+        rows.forEach(row => {
+            const nombres = row.cells[0].textContent.toLowerCase();
+            const apellidos = row.cells[1].textContent.toLowerCase();
+            const documento = row.cells[2].textContent.toLowerCase();
+            const telefono = row.cells[3].textContent.toLowerCase();
+
+            if (
+                nombres.includes(filter) ||
+                apellidos.includes(filter) ||
+                documento.includes(filter) ||
+                telefono.includes(filter)
+            ) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+</script>
+
 <link rel="stylesheet" href="~/css/vehiculos.css" />
 <script src="~/js/vehiculos.js"></script>

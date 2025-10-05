@@ -1,65 +1,65 @@
 ﻿@model IEnumerable<Primera.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Tickets";
 }
 
-<h1>Index</h1>
+<h1>Tickets</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Crear Nuevo Ticket</a>
 </p>
-<table class="table">
+
+<!-- Barra de filtro -->
+<input type="text" id="filterInput" placeholder="Filtrar por placa, espacio, fecha o tarifa..." class="filter-bar" />
+
+<table id="ticketsTable" class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Vehiculo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EspacioEstacionamiento)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Fecha_hora_entrada)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Fecha_hora_salida)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Tarifa)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PagoTotal)
-            </th>
-            <th></th>
+            <th>Placa</th>
+            <th>Espacio</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th>Tarifa</th>
+            <th>Total</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Vehiculo.NoPlaca)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EspacioEstacionamiento.Estado)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Fecha_hora_entrada)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Fecha_hora_salida)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Tarifa.Descripcion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PagoTotal)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id_Ticket">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id_Ticket">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id_Ticket">Delete</a>
-            </td>
-        </tr>
-}
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td data-label="Placa">@item.Vehiculo.NoPlaca</td>
+                    <td data-label="Espacio">@item.EspacioEstacionamiento.Estado</td>
+                    <td data-label="Entrada">@item.Fecha_hora_entrada.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td data-label="Salida">@item.Fecha_hora_salida?.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td data-label="Tarifa">@item.Tarifa.Descripcion</td>
+                    <td data-label="Total">@item.PagoTotal.ToString("C")</td>
+                    <td data-label="Acciones">
+                        <a asp-action="Edit" asp-route-id="@item.Id_Ticket" class="btn btn-sm btn-primary me-1">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a asp-action="Details" asp-route-id="@item.Id_Ticket" class="btn btn-sm btn-success me-1">
+                            <i class="bi bi-eye"></i> Detalles
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id_Ticket" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7" class="text-center">No hay tickets registrados.</td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<!-- Reutilizar CSS y JS de Vehiculos para el diseño y buscador -->
+<link rel="stylesheet" href="~/css/vehiculos.css" />
+<script src="~/js/vehiculos.js"></script>

@@ -52,18 +52,41 @@ namespace Primera.Controllers
         }
 
         // POST: Pagoes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id_Pago,Id_Ticket,MontoPago,FechaPago,MetodoPago,EstadoPago")] Pago pago)
         {
+            if (!ModelState.IsValid)
+            {
+                // Capturar errores de validación
+                var errores = ModelState
+                    .Where(ms => ms.Value.Errors.Any())
+                    .Select(ms => new
+                    {
+                        Campo = ms.Key,
+                        Errores = ms.Value.Errors.Select(e => e.ErrorMessage).ToList()
+                    })
+                    .ToList();
+
+                // Mostrar en consola (para depurar)
+                foreach (var err in errores)
+                {
+                    Console.WriteLine($"Campo con error: {err.Campo} → {string.Join(", ", err.Errores)}");
+                }
+
+                // Enviar errores a la vista
+                TempData["ErroresValidacion"] = string.Join("<br>", errores.Select(e =>
+                    $"<strong>{e.Campo}</strong>: {string.Join(", ", e.Errores)}"));
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(pago);
                 await _context.SaveChangesAsync();
+                TempData["MensajeExito"] = "✅ Pago registrado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["Id_Ticket"] = new SelectList(_context.Tickets, "Id_Ticket", "NoPlaca", pago.Id_Ticket);
             return View(pago);
         }
@@ -86,8 +109,6 @@ namespace Primera.Controllers
         }
 
         // POST: Pagoes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id_Pago,Id_Ticket,MontoPago,FechaPago,MetodoPago,EstadoPago")] Pago pago)
@@ -97,12 +118,33 @@ namespace Primera.Controllers
                 return NotFound();
             }
 
+            if (!ModelState.IsValid)
+            {
+                var errores = ModelState
+                    .Where(ms => ms.Value.Errors.Any())
+                    .Select(ms => new
+                    {
+                        Campo = ms.Key,
+                        Errores = ms.Value.Errors.Select(e => e.ErrorMessage).ToList()
+                    })
+                    .ToList();
+
+                foreach (var err in errores)
+                {
+                    Console.WriteLine($"Campo con error: {err.Campo} → {string.Join(", ", err.Errores)}");
+                }
+
+                TempData["ErroresValidacion"] = string.Join("<br>", errores.Select(e =>
+                    $"<strong>{e.Campo}</strong>: {string.Join(", ", e.Errores)}"));
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(pago);
                     await _context.SaveChangesAsync();
+                    TempData["MensajeExito"] = "✅ Pago actualizado correctamente.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -152,6 +194,7 @@ namespace Primera.Controllers
             }
 
             await _context.SaveChangesAsync();
+            TempData["MensajeExito"] = "🗑️ Pago eliminado correctamente.";
             return RedirectToAction(nameof(Index));
         }
 

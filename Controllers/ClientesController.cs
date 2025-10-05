@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Primera.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Primera.Controllers
 {
@@ -21,23 +18,19 @@ namespace Primera.Controllers
         // GET: Clientes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Clientes.ToListAsync());
+            var clientes = await _context.Clientes.ToListAsync();
+            return View(clientes);
         }
 
         // GET: Clientes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var cliente = await _context.Clientes
                 .FirstOrDefaultAsync(m => m.Id_Cliente == id);
-            if (cliente == null)
-            {
-                return NotFound();
-            }
+
+            if (cliente == null) return NotFound();
 
             return View(cliente);
         }
@@ -49,12 +42,16 @@ namespace Primera.Controllers
         }
 
         // POST: Clientes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id_Cliente,Nombres,Apellidos,Telefono,Direccion")] Cliente cliente)
+        public async Task<IActionResult> Create(Cliente cliente)
         {
+            // Validar duplicado en servidor
+            if (_context.Clientes.Any(c => c.NumeroDocumentacion == cliente.NumeroDocumentacion))
+            {
+                ModelState.AddModelError("NumeroDocumentacion", "Este número de documento ya está registrado.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(cliente);
@@ -67,29 +64,25 @@ namespace Primera.Controllers
         // GET: Clientes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente == null)
-            {
-                return NotFound();
-            }
+            if (cliente == null) return NotFound();
+
             return View(cliente);
         }
 
         // POST: Clientes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id_Cliente,Nombres,Apellidos,Telefono,Direccion")] Cliente cliente)
+        public async Task<IActionResult> Edit(int id, Cliente cliente)
         {
-            if (id != cliente.Id_Cliente)
+            if (id != cliente.Id_Cliente) return NotFound();
+
+            // Validar duplicado en edición, excluyendo el registro actual
+            if (_context.Clientes.Any(c => c.NumeroDocumentacion == cliente.NumeroDocumentacion && c.Id_Cliente != id))
             {
-                return NotFound();
+                ModelState.AddModelError("NumeroDocumentacion", "Este número de documento ya está registrado.");
             }
 
             if (ModelState.IsValid)
@@ -101,14 +94,8 @@ namespace Primera.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClienteExists(cliente.Id_Cliente))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!ClienteExists(cliente.Id_Cliente)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -118,17 +105,11 @@ namespace Primera.Controllers
         // GET: Clientes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var cliente = await _context.Clientes
                 .FirstOrDefaultAsync(m => m.Id_Cliente == id);
-            if (cliente == null)
-            {
-                return NotFound();
-            }
+            if (cliente == null) return NotFound();
 
             return View(cliente);
         }
@@ -139,13 +120,21 @@ namespace Primera.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente != null)
-            {
-                _context.Clientes.Remove(cliente);
-            }
-
+            _context.Clientes.Remove(cliente);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        // Acción remota para validar duplicados por AJAX
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult VerificarDocumento(string numeroDocumentacion)
+        {
+            bool existe = _context.Clientes.Any(c => c.NumeroDocumentacion == numeroDocumentacion);
+            if (existe)
+            {
+                return Json($"El número de documento {numeroDocumentacion} ya existe.");
+            }
+            return Json(true);
         }
 
         private bool ClienteExists(int id)

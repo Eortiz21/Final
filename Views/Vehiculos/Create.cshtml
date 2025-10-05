@@ -1,0 +1,124 @@
+﻿@model Primera.Models.Vehiculo
+
+@{
+    ViewData["Title"] = "Crear Vehículo";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Crear Nuevo Vehículo</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" onsubmit="return validarPrefijo()">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Número de Placa -->
+                <div class="mb-3">
+                    <label class="form-label">Número de Placa</label>
+                    <div class="input-group">
+                        <select id="prefijoPlaca" class="form-select" onchange="ponerPrefijo()">
+                            <option value="">--Seleccione Prefijo--</option>
+                            <option value="00">00</option>
+                            <option value="A0">A0</option>
+                            <option value="C0">C0</option>
+                            <option value="CC">CC</option>
+                            <option value="CD">CD</option>
+                            <option value="DIS">DIS</option>
+                            <option value="MO">MO</option>
+                            <option value="MI">MI</option>
+                            <option value="TC">TC</option>
+                        </select>
+                        <input asp-for="NoPlaca" id="noPlaca" class="form-control" placeholder="Ingrese el resto de la placa" disabled />
+                    </div>
+                    <span asp-validation-for="NoPlaca" class="text-danger"></span>
+                </div>
+
+                <!-- Marca -->
+                <div class="mb-3">
+                    <label asp-for="Marca" class="form-label"></label>
+                    <input asp-for="Marca" class="form-control" />
+                    <span asp-validation-for="Marca" class="text-danger"></span>
+                </div>
+
+                <!-- Color -->
+                <div class="mb-3">
+                    <label asp-for="Color" class="form-label"></label>
+                    <input asp-for="Color" class="form-control" />
+                    <span asp-validation-for="Color" class="text-danger"></span>
+                </div>
+
+                <!-- Cliente -->
+                <div class="mb-3">
+                    <label asp-for="Id_Cliente" class="form-label"></label>
+                    <select asp-for="Id_Cliente" class="form-select" asp-items="ViewBag.Id_Cliente"></select>
+                    <span asp-validation-for="Id_Cliente" class="text-danger"></span>
+                </div>
+
+                <!-- Tipo -->
+                <div class="mb-3">
+                    <label asp-for="Id_Tipo" class="form-label"></label>
+                    <select asp-for="Id_Tipo" class="form-select" asp-items="ViewBag.Id_Tipo"></select>
+                    <span asp-validation-for="Id_Tipo" class="text-danger"></span>
+                </div>
+
+                <!-- Botones -->
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-plus-circle"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+
+            <!-- Errores personalizados -->
+            @if (ViewBag.Errores != null)
+            {
+                <div class="alert alert-danger mt-3">
+                    <ul>
+                        @foreach (var error in ViewBag.Errores)
+                        {
+                            <li>@error</li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script>
+    // Habilita el input solo si hay prefijo
+    function ponerPrefijo() {
+        const prefijo = document.getElementById('prefijoPlaca').value;
+        const inputPlaca = document.getElementById('noPlaca');
+
+        if(prefijo) {
+            inputPlaca.disabled = false;
+            inputPlaca.value = prefijo;
+            inputPlaca.focus();
+        } else {
+            inputPlaca.disabled = true;
+            inputPlaca.value = '';
+        }
+    }
+
+    // Valida antes de enviar que se haya seleccionado un prefijo
+    function validarPrefijo() {
+        const prefijo = document.getElementById('prefijoPlaca').value;
+        if(!prefijo) {
+            alert("Debe seleccionar un prefijo de placa antes de continuar.");
+            return false; // bloquea el envío del formulario
+        }
+        return true;
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

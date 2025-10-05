@@ -1,0 +1,133 @@
+﻿@model Primera.Models.TipoVehiculo
+
+@{
+    ViewData["Title"] = "Nuevo Tipo de Vehículo";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h3 class="mb-0">Registrar Nuevo Tipo de Vehículo</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create">
+                <!-- Tipo de Vehículo -->
+                <div class="mb-3">
+                    <label asp-for="Descripcion" class="form-label">Tipo de Vehículo</label>
+                    <select asp-for="Descripcion" class="form-select">
+                        <option value="">-- Seleccione tipo de vehículo --</option>
+
+                        <!-- Vehículos ligeros / particulares -->
+                        <optgroup label="Vehículos ligeros / particulares">
+                            <option value="Sedán">Sedán</option>
+                            <option value="Convertible">Convertible</option>
+                            <option value="SUV / Crossover">SUV / Crossover</option>
+                            <option value="Minivan / Monovolumen">Minivan / Monovolumen</option>
+                        </optgroup>
+
+                        <!-- Vehículos comerciales / carga ligera -->
+                        <optgroup label="Vehículos comerciales / carga ligera">
+                            <option value="Pickup">Pickup</option>
+                            <option value="Furgoneta / Van">Furgoneta / Van</option>
+                            <option value="Camioneta de reparto">Camioneta de reparto</option>
+                        </optgroup>
+
+                        <!-- Vehículos pesados / carga -->
+                        <optgroup label="Vehículos pesados / carga">
+                            <option value="Camión rígido">Camión rígido</option>
+                            <option value="Camión articulado / Trailer">Camión articulado / Trailer</option>
+                            <option value="Camión cisterna">Camión cisterna</option>
+                            <option value="Camión frigorífico">Camión frigorífico</option>
+                            <option value="Volquete / Dumper">Volquete / Dumper</option>
+                        </optgroup>
+
+                        <!-- Vehículos especializados -->
+                        <optgroup label="Vehículos especializados">
+                            <option value="Autobús urbano">Autobús urbano</option>
+                            <option value="Autobús escolar">Autobús escolar</option>
+                            <option value="Autobús turístico / largo recorrido">Autobús turístico / largo recorrido</option>
+                            <option value="Motocicleta">Motocicleta</option>
+                            <option value="Motocargo / Triciclo de carga">Motocargo / Triciclo de carga</option>
+                        </optgroup>
+                    </select>
+                    <span asp-validation-for="Descripcion" class="text-danger"></span>
+                </div>
+
+                <!-- Marca -->
+                <div class="mb-3">
+                    <label asp-for="Marca" class="form-label"></label>
+                    <input asp-for="Marca" class="form-control" />
+                    <span asp-validation-for="Marca" class="text-danger"></span>
+                </div>
+
+                <!-- Tamaño y Ejes -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Tamano" class="form-label"></label>
+                        <select asp-for="Tamano" class="form-select">
+                            <option value="">-- Seleccione tamaño --</option>
+                            <option value="Pequeño">Pequeño</option>
+                            <option value="Mediano">Mediano</option>
+                            <option value="Grande">Grande</option>
+                            <option value="Extra Largo">Extra Largo</option>
+                        </select>
+                        <span asp-validation-for="Tamano" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Ejes" class="form-label"></label>
+                        <select asp-for="Ejes" class="form-select">
+                            <option value="">-- Seleccione número de ejes --</option>
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                        </select>
+                        <span asp-validation-for="Ejes" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success me-2">
+                        <i class="bi bi-check-circle"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver a la lista
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    const searchInput = document.getElementById("searchInput");
+    const selectDescripcion = document.querySelector("select[asp-for='Descripcion']");
+    const inputMarca = document.querySelector("input[asp-for='Marca']"); // o 'select' si es select
+    const originalOptions = Array.from(selectDescripcion.options);
+
+    searchInput.addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        selectDescripcion.innerHTML = "";
+
+        originalOptions.forEach(option => {
+            const descripcion = option.text.toLowerCase();
+            const marca = inputMarca.value.toLowerCase();
+            // Mostrar opción si coincide con el filtro o es placeholder
+            if ((descripcion.includes(filter) || marca.includes(filter)) || option.value === "") {
+                selectDescripcion.appendChild(option);
+            }
+        });
+    });
+</script>
+
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

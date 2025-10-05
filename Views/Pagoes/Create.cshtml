@@ -1,52 +1,98 @@
 ﻿@model Primera.Models.Pago
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Registrar Pago";
 }
 
-<h1>Create</h1>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Registrar Pago</h3>
+        </div>
+        <div class="card-body">
 
-<h4>Pago</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Id_Ticket" class="control-label"></label>
-                <select asp-for="Id_Ticket" class ="form-control" asp-items="ViewBag.Id_Ticket"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="MontoPago" class="control-label"></label>
-                <input asp-for="MontoPago" class="form-control" />
-                <span asp-validation-for="MontoPago" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FechaPago" class="control-label"></label>
-                <input asp-for="FechaPago" class="form-control" />
-                <span asp-validation-for="FechaPago" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MetodoPago" class="control-label"></label>
-                <input asp-for="MetodoPago" class="form-control" />
-                <span asp-validation-for="MetodoPago" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EstadoPago" class="control-label"></label>
-                <input asp-for="EstadoPago" class="form-control" />
-                <span asp-validation-for="EstadoPago" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+            @* Mostrar errores o mensajes *@
+            @if (TempData["ErroresValidacion"] != null)
+            {
+                <div class="alert alert-danger">
+                    <h5><i class="bi bi-exclamation-triangle"></i> Errores de validación:</h5>
+                    @Html.Raw(TempData["ErroresValidacion"])
+                </div>
+            }
+
+            @if (TempData["MensajeExito"] != null)
+            {
+                <div class="alert alert-success">
+                    @Html.Raw(TempData["MensajeExito"])
+                </div>
+            }
+
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Seleccionar Ticket -->
+                <div class="mb-3">
+                    <label asp-for="Id_Ticket" class="form-label"></label>
+                    <select asp-for="Id_Ticket" class="form-select" asp-items="ViewBag.Id_Ticket">
+                        <option value="">-- Seleccione un ticket --</option>
+                    </select>
+                    <span asp-validation-for="Id_Ticket" class="text-danger"></span>
+                </div>
+
+                <!-- Monto de Pago -->
+                <div class="mb-3">
+                    <label asp-for="MontoPago" class="form-label"></label>
+                    <input asp-for="MontoPago" class="form-control" type="number" step="0.01" />
+                    <span asp-validation-for="MontoPago" class="text-danger"></span>
+                </div>
+
+                <!-- Fecha de Pago -->
+                <div class="mb-3">
+                    <label asp-for="FechaPago" class="form-label"></label>
+                    <input asp-for="FechaPago" class="form-control" type="date" />
+                    <span asp-validation-for="FechaPago" class="text-danger"></span>
+                </div>
+
+                <!-- Método de Pago -->
+                <div class="mb-3">
+                    <label asp-for="MetodoPago" class="form-label"></label>
+                    <select asp-for="MetodoPago" class="form-select">
+                        <option value="">-- Seleccione un método --</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Tarjeta">Tarjeta</option>
+                        <option value="Transferencia">Transferencia</option>
+                    </select>
+                    <span asp-validation-for="MetodoPago" class="text-danger"></span>
+                </div>
+
+                <!-- Estado de Pago -->
+                <div class="mb-3">
+                    <label asp-for="EstadoPago" class="form-label"></label>
+                    <select asp-for="EstadoPago" class="form-select">
+                        <option value="">-- Seleccione estado --</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Pagado">Pagado</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                    <span asp-validation-for="EstadoPago" class="text-danger"></span>
+                </div>
+
+                <!-- Botones -->
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-plus-circle"></i> Guardar Pago
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver a la lista
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

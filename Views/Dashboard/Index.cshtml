@@ -1,0 +1,178 @@
+﻿@{
+    ViewData["Title"] = "Dashboard Profesional";
+}
+
+<form method="post" asp-controller="Reportes" id="formExportar">
+    <input type="hidden" id="graficoVehiculos" name="graficoVehiculos" />
+    <input type="hidden" id="graficoOcupacion" name="graficoOcupacion" />
+    <input type="hidden" id="graficoClientes" name="graficoClientes" />
+
+    <button type="submit" formaction="@Url.Action("ExportarExcel", "Reportes")" class="btn btn-success btn-sm me-2">
+        <i class="fas fa-file-excel"></i> Exportar Excel
+    </button>
+    <button type="submit" formaction="@Url.Action("ExportarPdf", "Reportes")" class="btn btn-danger btn-sm">
+        <i class="fas fa-file-pdf"></i> Exportar PDF
+    </button>
+</form>
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Dashboard Profesional AutoManager</h2>
+
+    <!-- KPI Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary shadow-sm h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5>Total Vehículos</h5>
+                        <h3>@ViewData["TotalVehiculos"]</h3>
+                    </div>
+                    <i class="bi bi-car fs-2"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success shadow-sm h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5>Total Clientes</h5>
+                        <h3>@ViewData["TotalClientes"]</h3>
+                    </div>
+                    <i class="bi bi-people fs-2"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning shadow-sm h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5>Parqueos Disponibles</h5>
+                        <h3>@ViewData["Disponibles"]</h3>
+                    </div>
+                    <i class="bi bi-parking fs-2"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger shadow-sm h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5>Tickets Activos</h5>
+                        <h3>@ViewData["TicketsActivos"]</h3>
+                    </div>
+                    <i class="bi bi-speedometer2 fs-2"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">Vehículos por Tipo</div>
+                <div class="card-body">
+                    <canvas id="vehiculosTipoChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">Clientes Últimos 7 Días</div>
+                <div class="card-body">
+                    <canvas id="clientesDiaChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-3">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">Dinero Ganado Últimos 7 Días</div>
+                <div class="card-body">
+                    <canvas id="dineroDiaChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">Tickets Activos vs Pagados</div>
+                <div class="card-body">
+                    <canvas id="ticketsChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Charts
+        const vehiculosChart = new Chart(document.getElementById("vehiculosTipoChart"), {
+            type: "bar",
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewData["VehiculosPorTipoLabels"])),
+                datasets: [{
+                    label: "Cantidad",
+                    data: @Html.Raw(Json.Serialize(ViewData["VehiculosPorTipoData"])),
+                    backgroundColor: ["#007bff","#28a745","#ffc107","#dc3545","#6f42c1"]
+                }]
+            },
+            options: { responsive:true, scales:{y:{beginAtZero:true}} }
+        });
+
+        const clientesChart = new Chart(document.getElementById("clientesDiaChart"), {
+            type:"line",
+            data:{
+                labels:@Html.Raw(Json.Serialize(ViewData["Dias"])),
+                datasets:[{
+                    label:"Clientes diarios",
+                    data:@Html.Raw(Json.Serialize(ViewData["ClientesPorDiaData"])),
+                    fill:true,
+                    backgroundColor:"rgba(40,167,69,0.2)",
+                    borderColor:"#28a745",
+                    tension:0.3
+                }]
+            },
+            options:{responsive:true, scales:{y:{beginAtZero:true}}}
+        });
+
+        const dineroChart = new Chart(document.getElementById("dineroDiaChart"), {
+            type:"line",
+            data:{
+                labels:@Html.Raw(Json.Serialize(ViewData["Dias"])),
+                datasets:[{
+                    label:"Dinero Q",
+                    data:@Html.Raw(Json.Serialize(ViewData["DineroPorDiaData"])),
+                    fill:true,
+                    backgroundColor:"rgba(255,193,7,0.2)",
+                    borderColor:"#ffc107",
+                    tension:0.3
+                }]
+            },
+            options:{responsive:true, scales:{y:{beginAtZero:true}}}
+        });
+
+        const ticketsChart = new Chart(document.getElementById("ticketsChart"), {
+            type:"doughnut",
+            data:{
+                labels:["Activos","Pagados"],
+                datasets:[{
+                    data:[@ViewData["TicketsActivos"],@ViewData["TicketsPagados"]],
+                    backgroundColor:["#dc3545","#28a745"]
+                }]
+            },
+            options:{responsive:true}
+        });
+
+        // Enviar gráficos en base64 al servidor antes de exportar
+        const form = document.getElementById('formExportar');
+        form.addEventListener('submit', function(e){
+            document.getElementById('graficoVehiculos').value = vehiculosChart.toBase64Image();
+            document.getElementById('graficoOcupacion').value = dineroChart.toBase64Image();
+            document.getElementById('graficoClientes').value = clientesChart.toBase64Image();
+        });
+    </script>
+}

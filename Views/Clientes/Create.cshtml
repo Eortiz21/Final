@@ -24,6 +24,12 @@
                     <input asp-for="Apellidos" class="form-control" />
                     <span asp-validation-for="Apellidos" class="text-danger"></span>
                 </div>
+                <div class="mb-3">
+                    <label asp-for="NumeroDocumentacion" class="form-label"></label>
+                    <input asp-for="NumeroDocumentacion" class="form-control" />
+                    <span asp-validation-for="NumeroDocumentacion" class="text-danger"></span>
+                </div>
+
 
                 <div class="mb-3">
                     <label asp-for="Telefono" class="form-label"></label>
@@ -49,6 +55,28 @@
         </div>
     </div>
 </div>
+
+<script>
+    const searchInput = document.getElementById("searchInput");
+    const rows = document.querySelectorAll(".cliente-row"); // Cada fila de cliente en una tabla o lista
+
+    searchInput.addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+
+        rows.forEach(row => {
+            const nombres = row.querySelector(".nombres").textContent.toLowerCase();
+            const apellidos = row.querySelector(".apellidos").textContent.toLowerCase();
+            const documento = row.querySelector(".documento").textContent.toLowerCase();
+
+            if (nombres.includes(filter) || apellidos.includes(filter) || documento.includes(filter)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+</script>
+
 
 @section Scripts {
     @{

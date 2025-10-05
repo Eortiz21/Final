@@ -1,42 +1,37 @@
 ﻿@model Primera.Models.EspacioEstacionamiento
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles del Espacio de Estacionamiento";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Detalles del Espacio de Estacionamiento</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Número de Espacio</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.No_Espacio)</dd>
 
-<div>
-    <h4>EspacioEstacionamiento</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.No_Espacio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.No_Espacio)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nivel)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nivel)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TipoEspacio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TipoEspacio)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id_Espacio">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                <dt class="col-sm-3">Nivel</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Nivel)</dd>
+
+                <dt class="col-sm-3">Tipo de Espacio</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.TipoEspacio)</dd>
+
+                <dt class="col-sm-3">Estado</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Estado)</dd>
+            </dl>
+
+            <div class="mt-4">
+                <a asp-action="Edit" asp-route-id="@Model?.Id_Espacio" class="btn btn-primary me-2">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a la lista
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

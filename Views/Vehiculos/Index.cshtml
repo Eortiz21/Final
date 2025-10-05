@@ -1,0 +1,68 @@
+﻿@model IEnumerable<Primera.Models.Vehiculo>
+
+@{
+    ViewData["Title"] = "Vehículos";
+}
+
+<h1>Vehículos</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear Nuevo Vehículo</a>
+</p>
+
+<!-- Barra de filtro -->
+<input type="text" id="filterInput" placeholder="Filtrar por placa, marca, color o cliente..." class="filter-bar" />
+
+<table id="vehiculosTable" class="table">
+    <thead>
+        <tr>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Color</th>
+            <th>Cliente</th>
+            <th>Tipo Vehículo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td data-label="Placa">@item.NoPlaca</td>
+                    <td data-label="Marca">@item.Marca</td>
+                    <td data-label="Color">@item.Color</td>
+                    <td data-label="Cliente">
+                        @if (item.Cliente != null)
+                        {
+                            @($"{item.Cliente.NumeroDocumentacion} - {item.Cliente.Nombres} {item.Cliente.Apellidos}")
+                        }
+                    </td>
+                    <td data-label="Tipo Vehículo">@item.TipoVehiculo?.Descripcion</td>
+                    <td data-label="Acciones">
+                        <a asp-action="Edit" asp-route-id="@item.NoPlaca" class="btn btn-sm btn-primary me-1">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a asp-action="Details" asp-route-id="@item.NoPlaca" class="btn btn-sm btn-success me-1">
+                            <i class="bi bi-eye"></i> Detalles
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.NoPlaca" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">No hay vehículos registrados.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Reutilizar CSS y JS -->
+<link rel="stylesheet" href="~/css/vehiculos.css" />
+<script src="~/js/vehiculos.js"></script>

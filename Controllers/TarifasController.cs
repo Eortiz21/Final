@@ -45,12 +45,11 @@ namespace Primera.Controllers
         // GET: Tarifas/Create
         public IActionResult Create()
         {
+            CargarListaTarifas();   // <- Llenamos el ViewBag con la lista para el dropdown
             return View();
         }
 
         // POST: Tarifas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id_Tarifa,TipoTarifa,Monto,Descripcion")] Tarifa tarifa)
@@ -61,6 +60,7 @@ namespace Primera.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            CargarListaTarifas();   // <- Si hay error, volver a llenar el dropdown
             return View(tarifa);
         }
 
@@ -77,12 +77,12 @@ namespace Primera.Controllers
             {
                 return NotFound();
             }
+
+            CargarListaTarifas(tarifa.Id_Tarifa);   // <- Llenamos el ViewBag con selección actual
             return View(tarifa);
         }
 
         // POST: Tarifas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id_Tarifa,TipoTarifa,Monto,Descripcion")] Tarifa tarifa)
@@ -112,6 +112,7 @@ namespace Primera.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            CargarListaTarifas(tarifa.Id_Tarifa);  // <- Si hay error, volver a llenar el dropdown
             return View(tarifa);
         }
 
@@ -151,6 +152,16 @@ namespace Primera.Controllers
         private bool TarifaExists(int id)
         {
             return _context.Tarifas.Any(e => e.Id_Tarifa == id);
+        }
+
+        /// <summary>
+        /// Método para llenar el ViewBag con la lista de tarifas (ID como valor, TipoTarifa como texto).
+        /// </summary>
+        /// <param name="selectedId">El Id seleccionado (opcional).</param>
+        private void CargarListaTarifas(int? selectedId = null)
+        {
+            var tarifas = _context.Tarifas.ToList();
+            ViewBag.Id_Tarifa = new SelectList(tarifas, "Id_Tarifa", "TipoTarifa", selectedId);
         }
     }
 }

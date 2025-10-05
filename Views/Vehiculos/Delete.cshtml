@@ -1,0 +1,48 @@
+﻿@model Primera.Models.Vehiculo
+
+@{
+    ViewData["Title"] = "Eliminar Vehículo";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">Eliminar Vehículo</h3>
+        </div>
+        <div class="card-body">
+            <h5 class="text-warning mb-4">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                ¿Está seguro que desea eliminar este vehículo?
+            </h5>
+
+            <dl class="row">
+                <dt class="col-sm-3">Placa</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.NoPlaca)</dd>
+
+                <dt class="col-sm-3">Marca</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Marca)</dd>
+
+                <dt class="col-sm-3">Color</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Color)</dd>
+
+                <dt class="col-sm-3">Cliente</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Cliente.Apellidos)</dd>
+
+                <dt class="col-sm-3">Tipo de Vehículo</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.TipoVehiculo.Descripcion)</dd>
+            </dl>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="NoPlaca" />
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-danger me-2">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver a la lista
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,48 +1,36 @@
 ﻿@model Primera.Models.Pago
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles del Pago";
 }
 
-<h1>Details</h1>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4">
+            <h2 class="mb-0">Detalles del Pago</h2>
+        </div>
+        <div class="card-body p-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-3 fw-semibold">Ticket</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Ticket.NoPlaca)</dd>
 
-<div>
-    <h4>Pago</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Ticket)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Ticket.NoPlaca)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MontoPago)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MontoPago)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaPago)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaPago)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MetodoPago)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MetodoPago)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EstadoPago)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EstadoPago)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id_Pago">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                <dt class="col-sm-3 fw-semibold">Monto del Pago</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.MontoPago)</dd>
+
+                <dt class="col-sm-3 fw-semibold">Fecha de Pago</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.FechaPago)</dd>
+
+                <dt class="col-sm-3 fw-semibold">Método de Pago</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.MetodoPago)</dd>
+
+                <dt class="col-sm-3 fw-semibold">Estado del Pago</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.EstadoPago)</dd>
+            </dl>
+
+            <div class="mt-4 d-flex justify-content-between">
+                <a asp-action="Edit" asp-route-id="@Model?.Id_Pago" class="btn btn-warning">Editar Pago</a>
+                <a asp-action="Index" class="btn btn-outline-secondary">← Volver a la lista</a>
+            </div>
+        </div>
+    </div>
 </div>
