@@ -40,7 +40,7 @@ namespace Primera.Controllers
                 .Select(g => new { Tipo = g.Key, Cantidad = g.Count() })
                 .ToListAsync();
 
-            // Vehículos parqueados por tipo (más populares)
+            // Vehículo más parqueado
             var vehiculoMasParqueado = await _context.Tickets
                 .Include(t => t.Vehiculo)
                 .ThenInclude(v => v.TipoVehiculo)
@@ -49,32 +49,49 @@ namespace Primera.Controllers
                 .OrderByDescending(g => g.Cantidad)
                 .FirstOrDefaultAsync();
 
+            // Tickets por estado
+            var ticketsEnProgreso = await _context.Tickets.CountAsync(t => t.Estado == "En Progreso");
+            var ticketsCerrados = await _context.Tickets.CountAsync(t => t.Estado == "Cerrado");
+
             // Clientes por día últimos 7 días
-            var fechaInicio = DateTime.Now.AddDays(-6);
+            var fechaInicio = DateTime.Now.AddDays(-6).Date;
             var clientesPorDia = await _context.Tickets
-                .Where(t => t.Fecha_hora_entrada >= fechaInicio)
+                .Where(t => t.Fecha_hora_entrada.Date >= fechaInicio)
                 .GroupBy(t => t.Fecha_hora_entrada.Date)
-                .Select(g => new { Dia = g.Key, Cantidad = g.Select(t => t.Vehiculo.Id_Cliente).Distinct().Count() })
+                .Select(g => new
+                {
+                    Dia = g.Key,
+                    Cantidad = g.Select(t => t.Vehiculo.Id_Cliente).Distinct().Count()
+                })
                 .ToListAsync();
 
-            // Dinero ganado por día últimos 7 días
-            var dineroPorDia = await _context.Tickets
-                .Where(t => t.Fecha_hora_salida != null && t.Fecha_hora_entrada >= fechaInicio)
-                .GroupBy(t => t.Fecha_hora_salida.Value.Date)
-                .Select(g => new { Dia = g.Key, Total = g.Sum(t => t.PagoTotal) })
-                .ToListAsync();
-
-            // Preparar listas de días
             var dias = Enumerable.Range(0, 7)
                 .Select(i => fechaInicio.AddDays(i).ToString("dd/MM"))
                 .ToList();
 
-            var clientesPorDiaData = dias.Select(d => clientesPorDia.FirstOrDefault(c => c.Dia.ToString("dd/MM") == d)?.Cantidad ?? 0).ToList();
-            var dineroPorDiaData = dias.Select(d => dineroPorDia.FirstOrDefault(c => c.Dia.ToString("dd/MM") == d)?.Total ?? 0).ToList();
+            var clientesPorDiaData = dias
+                .Select(d => clientesPorDia.FirstOrDefault(c => c.Dia.ToString("dd/MM") == d)?.Cantidad ?? 0)
+                .ToList();
 
-            // Tickets activos vs pagados
-            var ticketsActivos = await _context.Tickets.CountAsync(t => t.Fecha_hora_salida == null);
-            var ticketsPagados = await _context.Tickets.CountAsync(t => t.Fecha_hora_salida != null && t.PagoTotal > 0);
+            // Dinero ganado por día últimos 7 días
+            var pagosPorDia = await _context.Pagos
+                .Where(p => p.FechaPago.Date >= fechaInicio && p.EstadoPago == "Pagado")
+                .GroupBy(p => p.FechaPago.Date)
+                .Select(g => new { Dia = g.Key, Total = g.Sum(p => p.MontoPago) })
+                .ToListAsync();
+
+            var ingresosPorDia = dias
+                .Select(d => pagosPorDia.FirstOrDefault(p => p.Dia.ToString("dd/MM") == d)?.Total ?? 0)
+                .ToList();
+
+            // NUEVOS KPIs
+            var dineroTotal = await _context.Pagos
+                .Where(p => p.EstadoPago == "Pagado")
+                .SumAsync(p => p.MontoPago);
+
+            var ticketsPagadosHoy = await _context.Pagos
+                .Where(p => p.FechaPago.Date == DateTime.Now.Date && p.EstadoPago == "Pagado")
+                .CountAsync();
 
             // Guardar en ViewData
             ViewData["TotalVehiculos"] = totalVehiculos;
@@ -89,12 +106,16 @@ namespace Primera.Controllers
 
             ViewData["VehiculoMasParqueado"] = vehiculoMasParqueado?.Tipo ?? "N/A";
 
+            ViewData["TicketsEnProgreso"] = ticketsEnProgreso;
+            ViewData["TicketsCerrados"] = ticketsCerrados;
+
             ViewData["Dias"] = dias;
             ViewData["ClientesPorDiaData"] = clientesPorDiaData;
-            ViewData["DineroPorDiaData"] = dineroPorDiaData;
+            ViewData["IngresosPorDia"] = ingresosPorDia;
 
-            ViewData["TicketsActivos"] = ticketsActivos;
-            ViewData["TicketsPagados"] = ticketsPagados;
+            // NUEVOS KPIs
+            ViewData["DineroTotal"] = dineroTotal;
+            ViewData["TicketsPagadosHoy"] = ticketsPagadosHoy;
 
             return View();
         }

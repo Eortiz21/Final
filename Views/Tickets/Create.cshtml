@@ -28,33 +28,21 @@
 
                 <div class="mb-3">
                     <label asp-for="Fecha_hora_entrada" class="form-label"></label>
-                    <input asp-for="Fecha_hora_entrada" type="datetime-local" class="form-control" id="entrada" />
+                    <input asp-for="Fecha_hora_entrada" type="datetime-local" class="form-control" />
                     <span asp-validation-for="Fecha_hora_entrada" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Fecha_hora_salida" class="form-label"></label>
-                    <input asp-for="Fecha_hora_salida" type="datetime-local" class="form-control" id="salida" />
-                    <span asp-validation-for="Fecha_hora_salida" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
                     <label asp-for="Id_Tarifa" class="form-label"></label>
-                    <select asp-for="Id_Tarifa" class="form-select" id="tarifaSelect">
-                        @foreach (var item in ViewBag.Tarifas)
-                        {
-                            <option value="@item.Id_Tarifa" data-precio="@item.Precio" data-tipo="@item.Tipo">
-                                @item.Nombre - Q.@item.Precio (@item.Tipo)
-                            </option>
-                        }
-                    </select>
+                    <select asp-for="Id_Tarifa" class="form-select" asp-items="ViewBag.Id_Tarifa"></select>
                     <span asp-validation-for="Id_Tarifa" class="text-danger"></span>
                 </div>
 
+                <!-- 👇 Combo de Estado -->
                 <div class="mb-3">
-                    <label asp-for="PagoTotal" class="form-label"></label>
-                    <input asp-for="PagoTotal" class="form-control" id="pagoTotal" />
-                    <span asp-validation-for="PagoTotal" class="text-danger"></span>
+                    <label asp-for="Estado" class="form-label"></label>
+                    <select asp-for="Estado" class="form-select" asp-items="ViewBag.Estado"></select>
+                    <span asp-validation-for="Estado" class="text-danger"></span>
                 </div>
 
                 <div class="mt-4">
@@ -66,57 +54,10 @@
                     </a>
                 </div>
             </form>
-
-            @if (ViewBag.Errores != null)
-            {
-                <div class="alert alert-danger mt-3">
-                    <ul>
-                        @foreach (var error in ViewBag.Errores)
-                        {
-                            <li>@error</li>
-                        }
-                    </ul>
-                </div>
-            }
         </div>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
-    <script>
-        function calcularPago() {
-            let entrada = new Date(document.getElementById("entrada").value);
-            let salida = new Date(document.getElementById("salida").value);
-            let tarifaSelect = document.getElementById("tarifaSelect");
-            let option = tarifaSelect.options[tarifaSelect.selectedIndex];
-            let precio = parseFloat(option.getAttribute("data-precio"));
-            let tipo = option.getAttribute("data-tipo");
-            let pago = 0;
-
-            if (!isNaN(entrada.getTime()) && !isNaN(salida.getTime()) && !isNaN(precio)) {
-                let diffMs = salida - entrada;
-                if (diffMs > 0) {
-                    if (tipo === "Hora") {
-                        let horas = Math.ceil(diffMs / (1000 * 60 * 60));
-                        pago = horas * precio;
-                    } else if (tipo === "Dia") {
-                        let dias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-                        pago = dias * precio;
-                    } else if (tipo === "Semana") {
-                        let semanas = Math.ceil(diffMs / (1000 * 60 * 60 * 24 * 7));
-                        pago = semanas * precio;
-                    }
-                }
-            }
-            document.getElementById("pagoTotal").value = pago > 0 ? pago.toFixed(2) : "";
-        }
-
-        document.getElementById("entrada").addEventListener("change", calcularPago);
-        document.getElementById("salida").addEventListener("change", calcularPago);
-        document.getElementById("tarifaSelect").addEventListener("change", calcularPago);
-    </script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

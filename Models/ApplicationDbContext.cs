@@ -21,22 +21,45 @@ namespace Primera.Models
         {
             base.OnModelCreating(modelBuilder);
 
+            // Tablas
             modelBuilder.Entity<Vehiculo>().ToTable("Vehiculos");
             modelBuilder.Entity<Cliente>().ToTable("Clientes");
             modelBuilder.Entity<TipoVehiculo>().ToTable("TipoVehiculos");
 
+            // Relaciones Vehiculo → Cliente
             modelBuilder.Entity<Vehiculo>()
                 .HasOne(v => v.Cliente)
                 .WithMany(c => c.Vehiculos)
                 .HasForeignKey(v => v.Id_Cliente)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Relaciones Vehiculo → TipoVehiculo
             modelBuilder.Entity<Vehiculo>()
                 .HasOne(v => v.TipoVehiculo)
                 .WithMany(t => t.Vehiculos)
                 .HasForeignKey(v => v.Id_Tipo)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Relaciones Ticket → Vehiculo
+            modelBuilder.Entity<Ticket>()
+                .HasOne(t => t.Vehiculo)
+                .WithMany()
+                .HasForeignKey(t => t.NoPlaca)      // usa columna existente NoPlaca
+                .HasPrincipalKey(v => v.NoPlaca);
+
+            // Relaciones Ticket → EspacioEstacionamiento
+            modelBuilder.Entity<Ticket>()
+                .HasOne(t => t.EspacioEstacionamiento)
+                .WithMany()
+                .HasForeignKey(t => t.Id_Espacio)
+                .HasPrincipalKey(e => e.Id_Espacio);
+
+            // Relaciones Ticket → Tarifa
+            modelBuilder.Entity<Ticket>()
+                .HasOne(t => t.Tarifa)
+                .WithMany()
+                .HasForeignKey(t => t.Id_Tarifa)
+                .HasPrincipalKey(tr => tr.Id_Tarifa);
         }
     }
 }
-

@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Dashboard Profesional";
+    ViewData["Title"] = "Dashboard ";
 }
 
 <form method="post" asp-controller="Reportes" id="formExportar">
@@ -57,10 +57,23 @@
             <div class="card text-white bg-danger shadow-sm h-100">
                 <div class="card-body d-flex justify-content-between align-items-center">
                     <div>
-                        <h5>Tickets Activos</h5>
-                        <h3>@ViewData["TicketsActivos"]</h3>
+                        <h5>Tickets En Progreso</h5>
+                        <h3>@ViewData["TicketsEnProgreso"]</h3>
                     </div>
                     <i class="bi bi-speedometer2 fs-2"></i>
+                </div>
+            </div>
+        </div>
+       
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-secondary shadow-sm h-100">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5>Tickets Pagados Hoy</h5>
+                        <h3>@ViewData["TicketsPagadosHoy"]</h3>
+                    </div>
+                    <i class="bi bi-check-circle fs-2"></i>
                 </div>
             </div>
         </div>
@@ -95,21 +108,15 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-danger text-white">Tickets Activos vs Pagados</div>
-                <div class="card-body">
-                    <canvas id="ticketsChart" height="150"></canvas>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
     <script>
-        // Charts
+        // Vehículos por tipo
         const vehiculosChart = new Chart(document.getElementById("vehiculosTipoChart"), {
             type: "bar",
             data: {
@@ -123,6 +130,7 @@
             options: { responsive:true, scales:{y:{beginAtZero:true}} }
         });
 
+        // Clientes últimos 7 días
         const clientesChart = new Chart(document.getElementById("clientesDiaChart"), {
             type:"line",
             data:{
@@ -139,32 +147,37 @@
             options:{responsive:true, scales:{y:{beginAtZero:true}}}
         });
 
+        // Dinero ganado últimos 7 días con valores encima de cada punto
         const dineroChart = new Chart(document.getElementById("dineroDiaChart"), {
             type:"line",
             data:{
                 labels:@Html.Raw(Json.Serialize(ViewData["Dias"])),
                 datasets:[{
                     label:"Dinero Q",
-                    data:@Html.Raw(Json.Serialize(ViewData["DineroPorDiaData"])),
+                    data:@Html.Raw(Json.Serialize(ViewData["IngresosPorDia"])),
                     fill:true,
                     backgroundColor:"rgba(255,193,7,0.2)",
                     borderColor:"#ffc107",
                     tension:0.3
                 }]
             },
-            options:{responsive:true, scales:{y:{beginAtZero:true}}}
-        });
-
-        const ticketsChart = new Chart(document.getElementById("ticketsChart"), {
-            type:"doughnut",
-            data:{
-                labels:["Activos","Pagados"],
-                datasets:[{
-                    data:[@ViewData["TicketsActivos"],@ViewData["TicketsPagados"]],
-                    backgroundColor:["#dc3545","#28a745"]
-                }]
+            options:{
+                responsive:true,
+                scales:{y:{beginAtZero:true}},
+                plugins: {
+                    legend: { display: true },
+                    datalabels: {
+                        align: 'top',
+                        anchor: 'end',
+                        color: '#000',
+                        font: { weight: 'bold' },
+                        formatter: function(value){
+                            return 'Q' + value.toFixed(2);
+                        }
+                    }
+                }
             },
-            options:{responsive:true}
+            plugins: [ChartDataLabels]
         });
 
         // Enviar gráficos en base64 al servidor antes de exportar

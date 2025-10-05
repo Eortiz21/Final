@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Primera.Models;
 
@@ -11,9 +12,11 @@ using Primera.Models;
 namespace Primera.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251005155144_Beta2Par")]
+    partial class Beta2Par
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -362,15 +365,13 @@ namespace Primera.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Ticket"));
 
-                    b.Property<int?>("EspacioEstacionamientoId_Espacio")
+                    b.Property<int>("EspacioEstacionamientoId_Espacio")
                         .HasColumnType("int");
 
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<DateTime>("Fecha_hora_entrada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("Fecha_hora_salida")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Id_Espacio")
@@ -384,20 +385,20 @@ namespace Primera.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int?>("TarifaId_Tarifa")
-                        .HasColumnType("int");
+                    b.Property<decimal>("PagoTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("VehiculoNoPlaca")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id_Ticket");
 
                     b.HasIndex("EspacioEstacionamientoId_Espacio");
 
-                    b.HasIndex("Id_Espacio");
-
                     b.HasIndex("Id_Tarifa");
 
-                    b.HasIndex("NoPlaca");
-
-                    b.HasIndex("TarifaId_Tarifa");
+                    b.HasIndex("VehiculoNoPlaca");
 
                     b.ToTable("Tickets");
                 });
@@ -528,31 +529,23 @@ namespace Primera.Migrations
 
             modelBuilder.Entity("Primera.Models.Ticket", b =>
                 {
-                    b.HasOne("Primera.Models.EspacioEstacionamiento", null)
-                        .WithMany("Tickets")
-                        .HasForeignKey("EspacioEstacionamientoId_Espacio");
-
                     b.HasOne("Primera.Models.EspacioEstacionamiento", "EspacioEstacionamiento")
-                        .WithMany()
-                        .HasForeignKey("Id_Espacio")
+                        .WithMany("Tickets")
+                        .HasForeignKey("EspacioEstacionamientoId_Espacio")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Primera.Models.Tarifa", "Tarifa")
-                        .WithMany()
+                        .WithMany("Tickets")
                         .HasForeignKey("Id_Tarifa")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Primera.Models.Vehiculo", "Vehiculo")
                         .WithMany()
-                        .HasForeignKey("NoPlaca")
+                        .HasForeignKey("VehiculoNoPlaca")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Primera.Models.Tarifa", null)
-                        .WithMany("Tickets")
-                        .HasForeignKey("TarifaId_Tarifa");
 
                     b.Navigation("EspacioEstacionamiento");
 
