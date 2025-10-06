@@ -12,16 +12,12 @@
         </a>
     </div>
 
-    <!-- 💬 BARRA DE BÚSQUEDA + BOTÓN -->
-    <!-- Barra de búsqueda con botón verde -->
+    <!-- 💬 BARRA DE BÚSQUEDA SIN BOTÓN -->
     <div class="input-group mb-3">
         <input type="text" 
                id="filterInput" 
                placeholder="Filtrar por id, espacio, nivel, tipo o estado..." 
                class="form-control" />
-        <button id="searchButton" class="btn btn-success" type="button">
-            <i class="bi bi-search"></i> Buscar
-        </button>
     </div>
     <!-- 💬 FIN DE LA BARRA DE BÚSQUEDA -->
 
@@ -66,36 +62,24 @@
 <link rel="stylesheet" href="~/css/vehiculos.css" />
 <script src="~/js/vehiculos.js"></script>
 
-<!-- 💚 Script de búsqueda funcional -->
+<!-- 💚 Script de búsqueda automática -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const input = document.getElementById("filterInput");
-        const button = document.getElementById("searchButton");
         const table = document.getElementById("espaciosTable");
         const rows = table.getElementsByTagName("tr");
 
-        button.addEventListener("click", function () {
+        input.addEventListener("keyup", function () {
             const filter = input.value.toLowerCase().trim();
 
-            // Si no se ingresó texto, mostrar todas las filas
-            if (filter === "") {
-                for (let i = 1; i < rows.length; i++) {
-                    rows[i].style.display = "";
-                }
-                return;
-            }
-
-            // Recorremos las filas y mostramos solo las que coincidan
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
                 const text = row.innerText.toLowerCase();
 
-                if (text.includes(filter)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
+                // Si el texto coincide, mostrar; si no, ocultar
+                row.style.display = text.includes(filter) ? "" : "none";
             }
         });
     });
 </script>
+

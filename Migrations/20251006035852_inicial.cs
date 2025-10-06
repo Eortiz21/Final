@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Primera.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -254,7 +254,9 @@ namespace Primera.Migrations
                     Id_Ticket = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NoPlaca = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    VehiculoNoPlaca = table.Column<string>(type: "nvarchar(20)", nullable: false),
                     Id_Espacio = table.Column<int>(type: "int", nullable: false),
+                    EspacioEstacionamientoId_Espacio = table.Column<int>(type: "int", nullable: false),
                     Fecha_hora_entrada = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Fecha_hora_salida = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Id_Tarifa = table.Column<int>(type: "int", nullable: false),
@@ -264,8 +266,8 @@ namespace Primera.Migrations
                 {
                     table.PrimaryKey("PK_Tickets", x => x.Id_Ticket);
                     table.ForeignKey(
-                        name: "FK_Tickets_EspacioEstacionamientos_Id_Espacio",
-                        column: x => x.Id_Espacio,
+                        name: "FK_Tickets_EspacioEstacionamientos_EspacioEstacionamientoId_Espacio",
+                        column: x => x.EspacioEstacionamientoId_Espacio,
                         principalTable: "EspacioEstacionamientos",
                         principalColumn: "Id_Espacio",
                         onDelete: ReferentialAction.Cascade);
@@ -276,8 +278,8 @@ namespace Primera.Migrations
                         principalColumn: "Id_Tarifa",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Tickets_Vehiculos_NoPlaca",
-                        column: x => x.NoPlaca,
+                        name: "FK_Tickets_Vehiculos_VehiculoNoPlaca",
+                        column: x => x.VehiculoNoPlaca,
                         principalTable: "Vehiculos",
                         principalColumn: "NoPlaca",
                         onDelete: ReferentialAction.Cascade);
@@ -351,9 +353,9 @@ namespace Primera.Migrations
                 column: "Id_Ticket");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tickets_Id_Espacio",
+                name: "IX_Tickets_EspacioEstacionamientoId_Espacio",
                 table: "Tickets",
-                column: "Id_Espacio");
+                column: "EspacioEstacionamientoId_Espacio");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_Id_Tarifa",
@@ -361,9 +363,9 @@ namespace Primera.Migrations
                 column: "Id_Tarifa");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tickets_NoPlaca",
+                name: "IX_Tickets_VehiculoNoPlaca",
                 table: "Tickets",
-                column: "NoPlaca");
+                column: "VehiculoNoPlaca");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vehiculos_Id_Cliente",
