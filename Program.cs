@@ -1,36 +1,48 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Localization; // 🟢 nuevo
+using System.Globalization; // 🟢 nuevo
 using Primera.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Agrega controladores con vistas (MVC)
-builder.Services.AddControllersWithViews();
+// Agrega soporte de localización 🟢
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-// Obtiene la cadena de conexión desde appsettings.json
+builder.Services
+    .AddControllersWithViews()
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization(); // Traduce mensajes de validación
+
+// Cadena de conexión desde appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("ConexionLocalBD")
     ?? throw new InvalidOperationException("Connection string 'ConexionLocalBD' not found.");
 
-// Registra el DbContext con SQL Server (Scoped por defecto)
+// Registra el DbContext con SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 // Configura Identity con tu DbContext
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = false; // No requiere confirmación de correo
+    options.SignIn.RequireConfirmedAccount = false;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Construye la aplicación web con toda la configuración previa
+// Construye la aplicación
 var app = builder.Build();
 
+// 🟢 Configura el idioma por defecto (Español)
+var defaultCulture = new CultureInfo("es");
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(defaultCulture),
+    SupportedCultures = new List<CultureInfo> { defaultCulture },
+    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+};
+app.UseRequestLocalization(localizationOptions);
 
-
-
-
-
-// Configuración del pipeline HTTP
+// Pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -44,18 +56,15 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Rutas de MVC
+// Rutas MVC + Razor Pages
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-// Ruta por defecto: HomeController -> Index
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Razor Pages (para Identity)
 app.MapRazorPages();
 
-// Ejecuta la aplicación
 app.Run();

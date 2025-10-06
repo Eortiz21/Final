@@ -57,24 +57,17 @@
                     <a class="nav-link" asp-controller="Clientes" asp-action="Index">
                         <i class="bi bi-person-vcard"></i> Clientes
                     </a>
-                </li>
+
                 <li class="nav-item">
                     <a class="nav-link" asp-controller="EspacioEstacionamientoes" asp-action="Index">
                         <i class="bi bi-square"></i> Espacios de Estacionamiento
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Pagoes" asp-action="Index">
-                        <i class="bi bi-cash"></i> Pago
-                    </a>
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Tarifas" asp-action="Index">
-                        <i class="bi bi-tags"></i> Tarifas
-                    </a>
+
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" asp-controller="Tickets" asp-action="Index">
-                        <i class="bi bi-ticket-perforated"></i> Ticket
+                    <a class="nav-link" asp-controller="TipoVehiculoes" asp-action="Index">
+                        <i class="bi bi-truck"></i> TipoVehiculo
                     </a>
                 </li>
                 <li class="nav-item">
@@ -84,10 +77,22 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" asp-controller="TipoVehiculoes" asp-action="Index">
-                        <i class="bi bi-truck"></i> TipoVehiculo
+                    <a class="nav-link" asp-controller="Tarifas" asp-action="Index">
+                        <i class="bi bi-tags"></i> Tarifas
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Tickets" asp-action="Index">
+                        <i class="bi bi-ticket-perforated"></i> Ticket
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Pagoes" asp-action="Index">
+                        <i class="bi bi-cash"></i> Pago
+                    </a>
+
             </ul>
         </nav>
 
@@ -111,6 +116,8 @@
                             <span class="navbar-toggler-icon"></span>
                         </button>
 
+
+
                         <div class="collapse navbar-collapse" id="mainNavbar">
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li class="nav-item">
@@ -119,35 +126,27 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacidad</a>
                                 </li>
-                                <!-- Barra de búsqueda -->
-                                <form class="d-flex me-2" role="search" method="get" asp-controller="Home" asp-action="Search">
-                                    <input class="form-control form-control-sm me-2" type="search" name="query" placeholder="Buscar..." aria-label="Buscar">
-                                    <button class="btn btn-outline-success btn-sm" type="submit">Buscar</button>
-                                </form>
                             </ul>
 
+                            <div class="d-flex align-items-center ms-auto">
+                                <!-- Botón de cambio de tema -->
+                                <button id="themeToggle" class="btn btn-outline-secondary me-1" title="Cambiar tema">
+                                    <i class="bi bi-sun" id="themeIcon"></i>
+                                </button>
 
-
-                            <!-- Botón de cambio de tema -->
-                            <button id="themeToggle" class="btn btn-outline-secondary me-2" title="Cambiar tema">
-                                <i class="bi bi-sun" id="themeIcon"></i>
-                            </button>
-
-                            <!-- Menú de usuario -->
-                            <div class="dropdown">
-                                <a href="#" class="btn btn-outline-primary dropdown-toggle d-flex align-items-center" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle fs-4 me-1"></i>
-                                    <span>@userName</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Settings"><i class="bi bi-gear me-2"></i>Configuración</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="bi bi-person me-2"></i>Perfil</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <l<li>
-    <form method="post" asp-area="Identity" asp-page="/Account/Logout" onsubmit="return confirmLogout();">
-        <button type="submit" class="dropdown-item text-danger">
-            <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
-        </button>
+                                <!-- Menú de usuario -->
+                                <div class="dropdown">
+                                    <a href="#" class="btn btn-outline-primary dropdown-toggle d-flex align-items-center" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-person-circle fs-4 me-1"></i>
+                                        <span>@userName</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                        <li>
+                                            <form method="post" asp-area="Identity" asp-page="/Account/Logout" onsubmit="return confirmLogout();">
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+                    
+                    </button>
     </form>
 </li>
 
