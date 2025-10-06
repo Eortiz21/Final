@@ -28,16 +28,12 @@ namespace Primera.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var espacioEstacionamiento = await _context.EspacioEstacionamientos
                 .FirstOrDefaultAsync(m => m.Id_Espacio == id);
             if (espacioEstacionamiento == null)
-            {
                 return NotFound();
-            }
 
             return View(espacioEstacionamiento);
         }
@@ -45,12 +41,11 @@ namespace Primera.Controllers
         // GET: EspacioEstacionamientoes/Create
         public IActionResult Create()
         {
+            ViewData["Estado"] = new SelectList(new[] { "Libre", "Ocupado" });
             return View();
         }
 
         // POST: EspacioEstacionamientoes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id_Espacio,No_Espacio,Nivel,TipoEspacio,Estado")] EspacioEstacionamiento espacioEstacionamiento)
@@ -61,6 +56,7 @@ namespace Primera.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["Estado"] = new SelectList(new[] { "Libre", "Ocupado" }, espacioEstacionamiento.Estado);
             return View(espacioEstacionamiento);
         }
 
@@ -68,29 +64,23 @@ namespace Primera.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var espacioEstacionamiento = await _context.EspacioEstacionamientos.FindAsync(id);
             if (espacioEstacionamiento == null)
-            {
                 return NotFound();
-            }
+
+            ViewData["Estado"] = new SelectList(new[] { "Libre", "Ocupado" }, espacioEstacionamiento.Estado);
             return View(espacioEstacionamiento);
         }
 
         // POST: EspacioEstacionamientoes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id_Espacio,No_Espacio,Nivel,TipoEspacio,Estado")] EspacioEstacionamiento espacioEstacionamiento)
         {
             if (id != espacioEstacionamiento.Id_Espacio)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -102,16 +92,13 @@ namespace Primera.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!EspacioEstacionamientoExists(espacioEstacionamiento.Id_Espacio))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["Estado"] = new SelectList(new[] { "Libre", "Ocupado" }, espacioEstacionamiento.Estado);
             return View(espacioEstacionamiento);
         }
 
@@ -119,16 +106,12 @@ namespace Primera.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var espacioEstacionamiento = await _context.EspacioEstacionamientos
                 .FirstOrDefaultAsync(m => m.Id_Espacio == id);
             if (espacioEstacionamiento == null)
-            {
                 return NotFound();
-            }
 
             return View(espacioEstacionamiento);
         }

@@ -1,59 +1,58 @@
 ﻿@model Primera.Models.Ticket
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Ticket";
 }
 
-<h1>Edit</h1>
-
-<h4>Ticket</h4>
+<h4>Editar Ticket</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id_Ticket" />
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="NoPlaca" class="control-label"></label>
                 <select asp-for="NoPlaca" class="form-control" asp-items="ViewBag.NoPlaca"></select>
                 <span asp-validation-for="NoPlaca" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Id_Espacio" class="control-label"></label>
                 <select asp-for="Id_Espacio" class="form-control" asp-items="ViewBag.Id_Espacio"></select>
                 <span asp-validation-for="Id_Espacio" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Fecha_hora_entrada" class="control-label"></label>
-                <input asp-for="Fecha_hora_entrada" class="form-control" />
+                <input asp-for="Fecha_hora_entrada" type="datetime-local" class="form-control"
+                       value="@Model.Fecha_hora_entrada.ToString("yyyy-MM-ddTHH:mm")" />
                 <span asp-validation-for="Fecha_hora_entrada" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Fecha_hora_salida" class="control-label"></label>
-                <input asp-for="Fecha_hora_salida" class="form-control" />
-                <span asp-validation-for="Fecha_hora_salida" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Id_Tarifa" class="control-label"></label>
                 <select asp-for="Id_Tarifa" class="form-control" asp-items="ViewBag.Id_Tarifa"></select>
                 <span asp-validation-for="Id_Tarifa" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="PagoTotal" class="control-label"></label>
-                <input asp-for="PagoTotal" class="form-control" />
-                <span asp-validation-for="PagoTotal" class="text-danger"></span>
+
+            <!-- Combo Estado corregido -->
+            <div class="form-group mb-3">
+                <label asp-for="Estado" class="control-label"></label>
+                <select asp-for="Estado" class="form-control" asp-items="@(ViewData["Estado"] as SelectList)"></select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+</div>  
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Primera.Models
 {
@@ -10,26 +9,28 @@ namespace Primera.Models
         [Key]
         public int Id_Ticket { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La placa es obligatoria.")]
         [StringLength(20)]
-        public string NoPlaca { get; set; }
-        public Vehiculo Vehiculo { get; set; }
+        public string NoPlaca { get; set; } = string.Empty;
 
+        public Vehiculo? Vehiculo { get; set; }
+
+        [Required(ErrorMessage = "El espacio es obligatorio.")]
         public int Id_Espacio { get; set; }
-        public EspacioEstacionamiento EspacioEstacionamiento { get; set; }
+        public EspacioEstacionamiento? EspacioEstacionamiento { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La fecha de entrada es obligatoria.")]
         public DateTime Fecha_hora_entrada { get; set; }
 
-        public DateTime? Fecha_hora_salida { get; set; }
-
-        [ForeignKey("Tarifa")]
+        [Required(ErrorMessage = "La tarifa es obligatoria.")]
         public int Id_Tarifa { get; set; }
-        public Tarifa Tarifa { get; set; }
+        public Tarifa? Tarifa { get; set; }
 
-        [Required]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal PagoTotal { get; set; }
+        // ✅ Nuevo campo Estado
+        [Required(ErrorMessage = "El estado del ticket es obligatorio.")]
+        [StringLength(20)]
+        [Display(Name = "Estado del Ticket")]
+        public string Estado { get; set; } = "Activo"; // valores posibles: Activo, Cerrado, Cancelado, etc.
 
         public ICollection<Pago> Pagos { get; set; } = new List<Pago>();
     }

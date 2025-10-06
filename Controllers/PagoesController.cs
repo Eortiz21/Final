@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -21,25 +20,24 @@ namespace Primera.Controllers
         // GET: Pagoes
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Pagos.Include(p => p.Ticket);
-            return View(await applicationDbContext.ToListAsync());
+            var pagos = _context.Pagos
+                .Include(p => p.Ticket)
+                .ThenInclude(t => t.Tarifa);
+
+            return View(await pagos.ToListAsync());
         }
 
         // GET: Pagoes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var pago = await _context.Pagos
                 .Include(p => p.Ticket)
+                .ThenInclude(t => t.Tarifa)
                 .FirstOrDefaultAsync(m => m.Id_Pago == id);
-            if (pago == null)
-            {
-                return NotFound();
-            }
+
+            if (pago == null) return NotFound();
 
             return View(pago);
         }
@@ -47,137 +45,198 @@ namespace Primera.Controllers
         // GET: Pagoes/Create
         public IActionResult Create()
         {
-            ViewData["Id_Ticket"] = new SelectList(_context.Tickets, "Id_Ticket", "NoPlaca");
-            return View();
+            var ticketsEnProgreso = _context.Tickets
+                .Include(t => t.Tarifa)
+                .Where(t => t.Estado == "En Progreso")
+                .ToList();
+
+            ViewData["Id_Ticket"] = new SelectList(
+                ticketsEnProgreso,
+                "Id_Ticket",
+                "NoPlaca"
+            );
+
+            return View(new Pago());
         }
 
         // POST: Pagoes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id_Pago,Id_Ticket,MontoPago,FechaPago,MetodoPago,EstadoPago")] Pago pago)
+        public async Task<IActionResult> Create([Bind("Id_Ticket,FechaPago,MetodoPago,EstadoPago,MontoPago")] Pago pago, string accion)
         {
-            if (!ModelState.IsValid)
+            var ticket = _context.Tickets
+                .Include(t => t.Tarifa)
+                .FirstOrDefault(t => t.Id_Ticket == pago.Id_Ticket);
+
+            if (ticket == null)
             {
-                // Capturar errores de validación
-                var errores = ModelState
-                    .Where(ms => ms.Value.Errors.Any())
-                    .Select(ms => new
-                    {
-                        Campo = ms.Key,
-                        Errores = ms.Value.Errors.Select(e => e.ErrorMessage).ToList()
-                    })
-                    .ToList();
-
-                // Mostrar en consola (para depurar)
-                foreach (var err in errores)
-                {
-                    Console.WriteLine($"Campo con error: {err.Campo} → {string.Join(", ", err.Errores)}");
-                }
-
-                // Enviar errores a la vista
-                TempData["ErroresValidacion"] = string.Join("<br>", errores.Select(e =>
-                    $"<strong>{e.Campo}</strong>: {string.Join(", ", e.Errores)}"));
+                ModelState.AddModelError("Id_Ticket", "Debe seleccionar un ticket válido.");
+                ViewData["Id_Ticket"] = new SelectList(
+                    _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
+                    "Id_Ticket",
+                    "NoPlaca",
+                    pago.Id_Ticket
+                );
+                return View(pago);
             }
 
-            if (ModelState.IsValid)
+            pago.Ticket = ticket;
+
+            if (accion == "calcular")
             {
-                _context.Add(pago);
+                try
+                {
+                    DateTime entrada = ticket.Fecha_hora_entrada;
+                    DateTime salida = pago.FechaPago;
+
+                    double horas = (salida - entrada).TotalHours;
+                    if (horas < 0) horas = 0;
+
+                    int horasRedondeadas = (int)Math.Ceiling(horas);
+                    pago.MontoPago = horasRedondeadas * ticket.Tarifa.Monto;
+
+                    ViewData["Id_Ticket"] = new SelectList(
+                        _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
+                        "Id_Ticket",
+                        "NoPlaca",
+                        pago.Id_Ticket
+                    );
+
+                    TempData["MensajeExito"] = $"Monto calculado: {pago.MontoPago:C}";
+
+                    ModelState.Clear();
+                    return View(pago);
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", ex.Message);
+                    ViewData["Id_Ticket"] = new SelectList(
+                        _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
+                        "Id_Ticket",
+                        "NoPlaca",
+                        pago.Id_Ticket
+                    );
+                    return View(pago);
+                }
+            }
+
+            if (accion == "guardar" && ModelState.IsValid)
+            {
+                DateTime entradaFinal = ticket.Fecha_hora_entrada;
+                DateTime salidaFinal = pago.FechaPago;
+
+                double horasFinal = (salidaFinal - entradaFinal).TotalHours;
+                if (horasFinal < 0) horasFinal = 0;
+
+                int horasRedondeadasFinal = (int)Math.Ceiling(horasFinal);
+                pago.MontoPago = horasRedondeadasFinal * ticket.Tarifa.Monto;
+
+                _context.Pagos.Add(pago);
+
+                // Actualizar ticket a cerrado
+                var ticketDb = await _context.Tickets.FindAsync(ticket.Id_Ticket);
+                if (ticketDb != null)
+                {
+                    ticketDb.Estado = "Cerrado";
+                    _context.Update(ticketDb);
+                }
+
                 await _context.SaveChangesAsync();
-                TempData["MensajeExito"] = "✅ Pago registrado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["Id_Ticket"] = new SelectList(_context.Tickets, "Id_Ticket", "NoPlaca", pago.Id_Ticket);
+            ViewData["Id_Ticket"] = new SelectList(
+                _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
+                "Id_Ticket",
+                "NoPlaca",
+                pago.Id_Ticket
+            );
             return View(pago);
         }
 
         // GET: Pagoes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var pago = await _context.Pagos.FindAsync(id);
-            if (pago == null)
-            {
-                return NotFound();
-            }
-            ViewData["Id_Ticket"] = new SelectList(_context.Tickets, "Id_Ticket", "NoPlaca", pago.Id_Ticket);
+            if (pago == null) return NotFound();
+
+            ViewData["Id_Ticket"] = new SelectList(
+                _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
+                "Id_Ticket",
+                "NoPlaca",
+                pago.Id_Ticket
+            );
+
             return View(pago);
         }
 
         // POST: Pagoes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id_Pago,Id_Ticket,MontoPago,FechaPago,MetodoPago,EstadoPago")] Pago pago)
+        public async Task<IActionResult> Edit(int id, [Bind("Id_Pago,Id_Ticket,FechaPago,MontoPago,MetodoPago,EstadoPago")] Pago pago)
         {
-            if (id != pago.Id_Pago)
-            {
-                return NotFound();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                var errores = ModelState
-                    .Where(ms => ms.Value.Errors.Any())
-                    .Select(ms => new
-                    {
-                        Campo = ms.Key,
-                        Errores = ms.Value.Errors.Select(e => e.ErrorMessage).ToList()
-                    })
-                    .ToList();
-
-                foreach (var err in errores)
-                {
-                    Console.WriteLine($"Campo con error: {err.Campo} → {string.Join(", ", err.Errores)}");
-                }
-
-                TempData["ErroresValidacion"] = string.Join("<br>", errores.Select(e =>
-                    $"<strong>{e.Campo}</strong>: {string.Join(", ", e.Errores)}"));
-            }
+            if (id != pago.Id_Pago) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var ticket = _context.Tickets.Include(t => t.Tarifa).FirstOrDefault(t => t.Id_Ticket == pago.Id_Ticket);
+                    if (ticket != null)
+                    {
+                        pago.Ticket = ticket;
+
+                        DateTime entrada = ticket.Fecha_hora_entrada;
+                        DateTime salida = pago.FechaPago;
+
+                        double horas = (salida - entrada).TotalHours;
+                        if (horas < 0) horas = 0;
+
+                        int horasRedondeadas = (int)Math.Ceiling(horas);
+                        pago.MontoPago = horasRedondeadas * ticket.Tarifa.Monto;
+
+                        // Actualizar ticket a cerrado
+                        var ticketDb = await _context.Tickets.FindAsync(ticket.Id_Ticket);
+                        if (ticketDb != null)
+                        {
+                            ticketDb.Estado = "Cerrado";
+                            _context.Update(ticketDb);
+                        }
+                    }
+
                     _context.Update(pago);
                     await _context.SaveChangesAsync();
-                    TempData["MensajeExito"] = "✅ Pago actualizado correctamente.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PagoExists(pago.Id_Pago))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!_context.Pagos.Any(e => e.Id_Pago == id)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Id_Ticket"] = new SelectList(_context.Tickets, "Id_Ticket", "NoPlaca", pago.Id_Ticket);
+
+            ViewData["Id_Ticket"] = new SelectList(
+                _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
+                "Id_Ticket",
+                "NoPlaca",
+                pago.Id_Ticket
+            );
             return View(pago);
         }
 
         // GET: Pagoes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var pago = await _context.Pagos
                 .Include(p => p.Ticket)
+                .ThenInclude(t => t.Tarifa)
                 .FirstOrDefaultAsync(m => m.Id_Pago == id);
-            if (pago == null)
-            {
-                return NotFound();
-            }
+
+            if (pago == null) return NotFound();
 
             return View(pago);
         }
@@ -188,19 +247,10 @@ namespace Primera.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var pago = await _context.Pagos.FindAsync(id);
-            if (pago != null)
-            {
-                _context.Pagos.Remove(pago);
-            }
+            if (pago != null) _context.Pagos.Remove(pago);
 
             await _context.SaveChangesAsync();
-            TempData["MensajeExito"] = "🗑️ Pago eliminado correctamente.";
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool PagoExists(int id)
-        {
-            return _context.Pagos.Any(e => e.Id_Pago == id);
         }
     }
 }
