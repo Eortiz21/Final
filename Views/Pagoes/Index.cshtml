@@ -27,15 +27,19 @@
                     <p class="card-text"><strong>Método:</strong> @item.MetodoPago</p>
                     <p class="card-text"><strong>Estado:</strong> @item.EstadoPago</p>
                 </div>
-                <div class="card-footer d-flex justify-content-between">
-                    <a asp-action="Edit" asp-route-id="@item.Id_Pago" class="btn btn-sm btn-primary">
+                <div class="card-footer d-flex justify-content-between flex-wrap">
+                    <a asp-action="Edit" asp-route-id="@item.Id_Pago" class="btn btn-sm btn-primary mb-1">
                         <i class="bi bi-pencil"></i> Editar
                     </a>
-                    <a asp-action="Details" asp-route-id="@item.Id_Pago" class="btn btn-sm btn-success">
+                    <a asp-action="Details" asp-route-id="@item.Id_Pago" class="btn btn-sm btn-success mb-1">
                         <i class="bi bi-eye"></i> Detalles
                     </a>
-                    <a asp-action="Delete" asp-route-id="@item.Id_Pago" class="btn btn-sm btn-danger">
+                    <a asp-action="Delete" asp-route-id="@item.Id_Pago" class="btn btn-sm btn-danger mb-1">
                         <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                    <!-- Botón de reimprimir recibo -->
+                    <a href="javascript:void(0);" onclick="reimprimir(@item.Id_Pago)" class="btn btn-sm btn-info mb-1">
+                        <i class="bi bi-printer"></i> Reimprimir
                     </a>
                 </div>
             </div>
@@ -49,8 +53,24 @@
     }
 </div>
 
-<!-- Script para barra de búsqueda -->
+<!-- Modal para reimprimir recibo -->
+<div class="modal fade" id="reciboModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Recibo de Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido cargado vía AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para barra de búsqueda y AJAX -->
 <script>
+    // Filtro de pagos
     const filterInput = document.getElementById('filterInput');
     filterInput.addEventListener('keyup', function () {
         const filter = filterInput.value.toLowerCase();
@@ -60,6 +80,18 @@
             card.style.display = text.includes(filter) ? '' : 'none';
         });
     });
+
+    // Función para reimprimir
+    function reimprimir(id) {
+        fetch(`/Pagoes/ReciboPartial/${id}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('modalBody').innerHTML = html;
+                var modal = new bootstrap.Modal(document.getElementById('reciboModal'));
+                modal.show();
+            })
+            .catch(err => console.error(err));
+    }
 </script>
 
 <link rel="stylesheet" href="~/css/vehiculos.css" />

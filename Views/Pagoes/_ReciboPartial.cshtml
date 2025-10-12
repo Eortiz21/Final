@@ -1,0 +1,17 @@
+﻿@model Primera.Models.Pago
+
+<div id="reciboContenido">
+    <h3>Recibo de Pago</h3>
+    <hr />
+    <p><strong>Ticket:</strong> @Model.Ticket.NoPlaca</p>
+    <p><strong>Fecha de Entrada:</strong> @Model.Ticket.Fecha_hora_entrada</p>
+    <p><strong>Fecha de Pago:</strong> @Model.FechaPago</p>
+    <p><strong>Monto Pagado:</strong> @Model.MontoPago.ToString("C")</p>
+    <p><strong>Método de Pago:</strong> @Model.MetodoPago</p>
+    <p><strong>Estado del Pago:</strong> @Model.EstadoPago</p>
+    <p><strong>Espacio:</strong> @Model.Ticket.Id_Espacio</p>
+</div>
+<div class="mt-3 text-end">
+    <button class="btn btn-success" onclick="imprimirRecibo()">Imprimir Recibo</button>
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+</div>

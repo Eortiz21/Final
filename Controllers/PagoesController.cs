@@ -56,7 +56,6 @@ namespace Primera.Controllers
                 "NoPlaca"
             );
 
-            // Serializar los datos necesarios para cálculo en cliente
             ViewBag.TicketsJson = System.Text.Json.JsonSerializer.Serialize(
                 ticketsEnProgreso.Select(t => new
                 {
@@ -82,7 +81,6 @@ namespace Primera.Controllers
             {
                 ModelState.AddModelError("Id_Ticket", "Debe seleccionar un ticket válido.");
 
-                // Volver a cargar SelectList y Json para la vista
                 var ticketsEnProgreso = _context.Tickets
                     .Include(t => t.Tarifa)
                     .Where(t => t.Estado == "En Progreso")
@@ -123,7 +121,6 @@ namespace Primera.Controllers
                     pago.MontoPago = horasRedondeadas * ticket.Tarifa.Monto;
 
                     TempData["MensajeExito"] = $"Monto calculado: {pago.MontoPago:C}";
-
                     ModelState.Clear();
                 }
                 catch (Exception ex)
@@ -131,7 +128,6 @@ namespace Primera.Controllers
                     ModelState.AddModelError("", ex.Message);
                 }
 
-                // Recargar SelectList y Json después del cálculo
                 var ticketsEnProgreso = _context.Tickets
                     .Include(t => t.Tarifa)
                     .Where(t => t.Estado == "En Progreso")
@@ -169,41 +165,50 @@ namespace Primera.Controllers
 
                 _context.Pagos.Add(pago);
 
-                // Actualizar ticket a "Cerrado"
+                // Cerrar ticket y liberar espacio
                 var ticketDb = await _context.Tickets.FindAsync(ticket.Id_Ticket);
                 if (ticketDb != null)
                 {
                     ticketDb.Estado = "Cerrado";
                     _context.Update(ticketDb);
+
+                    var espacio = await _context.EspacioEstacionamientos
+                        .FirstOrDefaultAsync(e => e.Id_Espacio == ticketDb.Id_Espacio);
+
+                    if (espacio != null)
+                    {
+                        espacio.Estado = "Libre";
+                        _context.Update(espacio);
+                    }
                 }
 
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["MensajeExito"] = "Pago realizado correctamente. El espacio ha sido liberado.";
+
+                // Redirigir automáticamente a la impresión del recibo
+                return RedirectToAction("Print", new { id = pago.Id_Pago });
             }
 
-            // Si no es válido o falla algo, recargar dropdown y JSON
-            {
-                var ticketsEnProgreso = _context.Tickets
-                    .Include(t => t.Tarifa)
-                    .Where(t => t.Estado == "En Progreso")
-                    .ToList();
+            var recargarTickets = _context.Tickets
+                .Include(t => t.Tarifa)
+                .Where(t => t.Estado == "En Progreso")
+                .ToList();
 
-                ViewData["Id_Ticket"] = new SelectList(
-                    ticketsEnProgreso,
-                    "Id_Ticket",
-                    "NoPlaca",
-                    pago.Id_Ticket
-                );
+            ViewData["Id_Ticket"] = new SelectList(
+                recargarTickets,
+                "Id_Ticket",
+                "NoPlaca",
+                pago.Id_Ticket
+            );
 
-                ViewBag.TicketsJson = System.Text.Json.JsonSerializer.Serialize(
-                    ticketsEnProgreso.Select(t => new
-                    {
-                        id = t.Id_Ticket,
-                        entrada = t.Fecha_hora_entrada,
-                        monto = t.Tarifa.Monto
-                    })
-                );
-            }
+            ViewBag.TicketsJson = System.Text.Json.JsonSerializer.Serialize(
+                recargarTickets.Select(t => new
+                {
+                    id = t.Id_Ticket,
+                    entrada = t.Fecha_hora_entrada,
+                    monto = t.Tarifa.Monto
+                })
+            );
 
             return View(pago);
         }
@@ -251,12 +256,20 @@ namespace Primera.Controllers
                         int horasRedondeadas = (int)Math.Ceiling(horas);
                         pago.MontoPago = horasRedondeadas * ticket.Tarifa.Monto;
 
-                        // Actualizar ticket a cerrado si no lo está
                         var ticketDb = await _context.Tickets.FindAsync(ticket.Id_Ticket);
                         if (ticketDb != null)
                         {
                             ticketDb.Estado = "Cerrado";
                             _context.Update(ticketDb);
+
+                            var espacio = await _context.EspacioEstacionamientos
+                                .FirstOrDefaultAsync(e => e.Id_Espacio == ticketDb.Id_Espacio);
+
+                            if (espacio != null)
+                            {
+                                espacio.Estado = "Libre";
+                                _context.Update(espacio);
+                            }
                         }
                     }
 
@@ -309,6 +322,42 @@ namespace Primera.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+
+        // GET: Pagoes/ReciboPartial/5
+        public async Task<IActionResult> ReciboPartial(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var pago = await _context.Pagos
+                .Include(p => p.Ticket)
+                .ThenInclude(t => t.Tarifa)
+                .Include(p => p.Ticket.Vehiculo)
+                .Include(p => p.Ticket.EspacioEstacionamiento)
+                .FirstOrDefaultAsync(p => p.Id_Pago == id);
+
+            if (pago == null) return NotFound();
+
+            return PartialView("_ReciboPartial", pago);
+        }
+
+
+
+
+        // GET: Pagoes/Print/5
+        public async Task<IActionResult> Print(int id)
+        {
+            var pago = await _context.Pagos
+                .Include(p => p.Ticket)
+                .ThenInclude(t => t.Vehiculo)
+                .Include(p => p.Ticket)
+                .ThenInclude(t => t.EspacioEstacionamiento)
+                .FirstOrDefaultAsync(p => p.Id_Pago == id);
+
+            if (pago == null) return NotFound();
+
+            return View(pago);
         }
     }
 }

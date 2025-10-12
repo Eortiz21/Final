@@ -48,11 +48,17 @@ namespace Primera.Controllers
         {
             ViewData["NoPlaca"] = new SelectList(_context.Vehiculos, "NoPlaca", "NoPlaca");
 
-            // Solo espacios libres
+            // Dropdown de espacios libres mostrando Nivel + Estado
             ViewData["Id_Espacio"] = new SelectList(
-                _context.EspacioEstacionamientos.Where(e => e.Estado == "Libre"),
+                _context.EspacioEstacionamientos
+                    .Where(e => e.Estado == "Libre")
+                    .Select(e => new
+                    {
+                        e.Id_Espacio,
+                        Display = $"Nivel {e.Nivel} - {e.Estado}"
+                    }),
                 "Id_Espacio",
-                "Estado"
+                "Display"
             );
 
             ViewData["Id_Tarifa"] = new SelectList(_context.Tarifas, "Id_Tarifa", "TipoTarifa");
@@ -69,26 +75,21 @@ namespace Primera.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(ticket);
-
-                // Cambiar el estado del espacio a "Ocupado"
-                var espacio = await _context.EspacioEstacionamientos
-                    .FirstOrDefaultAsync(e => e.Id_Espacio == ticket.Id_Espacio);
-
-                if (espacio != null)
-                {
-                    espacio.Estado = "Ocupado";
-                    _context.Update(espacio);
-                }
-
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
             ViewData["NoPlaca"] = new SelectList(_context.Vehiculos, "NoPlaca", "NoPlaca", ticket.NoPlaca);
             ViewData["Id_Espacio"] = new SelectList(
-                _context.EspacioEstacionamientos.Where(e => e.Estado == "Libre"),
+                _context.EspacioEstacionamientos
+                    .Where(e => e.Estado == "Libre")
+                    .Select(e => new
+                    {
+                        e.Id_Espacio,
+                        Display = $"Nivel {e.Nivel} - {e.Estado}"
+                    }),
                 "Id_Espacio",
-                "Estado",
+                "Display",
                 ticket.Id_Espacio
             );
             ViewData["Id_Tarifa"] = new SelectList(_context.Tarifas, "Id_Tarifa", "TipoTarifa", ticket.Id_Tarifa);
@@ -109,7 +110,7 @@ namespace Primera.Controllers
             ViewData["Id_Espacio"] = new SelectList(
                 _context.EspacioEstacionamientos,
                 "Id_Espacio",
-                "Estado",
+                "Id_Espacio",
                 ticket.Id_Espacio
             );
             ViewData["Id_Tarifa"] = new SelectList(_context.Tarifas, "Id_Tarifa", "TipoTarifa", ticket.Id_Tarifa);
@@ -144,13 +145,44 @@ namespace Primera.Controllers
             ViewData["Id_Espacio"] = new SelectList(
                 _context.EspacioEstacionamientos,
                 "Id_Espacio",
-                "Estado",
+                "Id_Espacio",
                 ticket.Id_Espacio
             );
             ViewData["Id_Tarifa"] = new SelectList(_context.Tarifas, "Id_Tarifa", "TipoTarifa", ticket.Id_Tarifa);
             ViewData["Estado"] = new SelectList(new[] { "En Progreso", "Cerrado" }, ticket.Estado);
 
             return View(ticket);
+        }
+
+        // GET: Tickets/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var ticket = await _context.Tickets
+                .Include(t => t.Vehiculo)
+                .Include(t => t.EspacioEstacionamiento)
+                .Include(t => t.Tarifa)
+                .FirstOrDefaultAsync(t => t.Id_Ticket == id);
+
+            if (ticket == null) return NotFound();
+
+            return View(ticket);
+        }
+
+        // POST: Tickets/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var ticket = await _context.Tickets.FindAsync(id);
+            if (ticket != null)
+            {
+                // Solo eliminar el ticket, no modificar el espacio
+                _context.Tickets.Remove(ticket);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         private bool TicketExists(int id)

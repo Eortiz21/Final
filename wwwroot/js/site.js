@@ -35,3 +35,20 @@
         icon.classList.toggle("bi-moon");
     });
 });
+
+
+<script>
+    function imprimirRecibo() {
+    var contenido = document.getElementById('reciboContenido').innerHTML;
+    var ventana = window.open('', '', 'width=800,height=600');
+    ventana.document.write('<html><head><title>Recibo</title>');
+        ventana.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">');
+            ventana.document.write('</head><body>');
+                ventana.document.write(contenido);
+                ventana.document.write('</body></html>');
+    ventana.document.close();
+    ventana.focus();
+    ventana.print();
+    ventana.close();
+}
+</script>
