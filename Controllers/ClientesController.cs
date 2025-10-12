@@ -27,9 +27,7 @@ namespace Primera.Controllers
         {
             if (id == null) return NotFound();
 
-            var cliente = await _context.Clientes
-                .FirstOrDefaultAsync(m => m.Id_Cliente == id);
-
+            var cliente = await _context.Clientes.FirstOrDefaultAsync(m => m.Id_Cliente == id);
             if (cliente == null) return NotFound();
 
             return View(cliente);
@@ -46,7 +44,6 @@ namespace Primera.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Cliente cliente)
         {
-            // Validar duplicado en servidor
             if (_context.Clientes.Any(c => c.NumeroDocumentacion == cliente.NumeroDocumentacion))
             {
                 ModelState.AddModelError("NumeroDocumentacion", "Este número de documento ya está registrado.");
@@ -58,6 +55,7 @@ namespace Primera.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(cliente);
         }
 
@@ -77,12 +75,23 @@ namespace Primera.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Cliente cliente)
         {
-            if (id != cliente.Id_Cliente) return NotFound();
+            if (id != cliente.Id_Cliente)
+                return NotFound();
 
-            // Validar duplicado en edición, excluyendo el registro actual
-            if (_context.Clientes.Any(c => c.NumeroDocumentacion == cliente.NumeroDocumentacion && c.Id_Cliente != id))
+            // Validar duplicado SOLO si cambió el documento
+            var existente = await _context.Clientes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id_Cliente == id);
+
+            if (existente == null)
+                return NotFound();
+
+            if (existente.NumeroDocumentacion != cliente.NumeroDocumentacion)
             {
-                ModelState.AddModelError("NumeroDocumentacion", "Este número de documento ya está registrado.");
+                if (_context.Clientes.Any(c => c.NumeroDocumentacion == cliente.NumeroDocumentacion))
+                {
+                    ModelState.AddModelError("NumeroDocumentacion", "Este número de documento ya está registrado.");
+                }
             }
 
             if (ModelState.IsValid)
@@ -91,14 +100,17 @@ namespace Primera.Controllers
                 {
                     _context.Update(cliente);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClienteExists(cliente.Id_Cliente)) return NotFound();
-                    else throw;
+                    if (!_context.Clientes.Any(e => e.Id_Cliente == id))
+                        return NotFound();
+                    else
+                        throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
+
             return View(cliente);
         }
 
@@ -107,8 +119,7 @@ namespace Primera.Controllers
         {
             if (id == null) return NotFound();
 
-            var cliente = await _context.Clientes
-                .FirstOrDefaultAsync(m => m.Id_Cliente == id);
+            var cliente = await _context.Clientes.FirstOrDefaultAsync(m => m.Id_Cliente == id);
             if (cliente == null) return NotFound();
 
             return View(cliente);
@@ -125,21 +136,17 @@ namespace Primera.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Acción remota para validar duplicados por AJAX
+        // Validación AJAX — se usa en Create y Edit (evita duplicados)
         [AcceptVerbs("GET", "POST")]
-        public IActionResult VerificarDocumento(string numeroDocumentacion)
+        public IActionResult VerificarDocumento(string numeroDocumentacion, int id_Cliente)
         {
-            bool existe = _context.Clientes.Any(c => c.NumeroDocumentacion == numeroDocumentacion);
-            if (existe)
-            {
-                return Json($"El número de documento {numeroDocumentacion} ya existe.");
-            }
-            return Json(true);
-        }
+            bool existe = _context.Clientes
+                .Any(c => c.NumeroDocumentacion == numeroDocumentacion && c.Id_Cliente != id_Cliente);
 
-        private bool ClienteExists(int id)
-        {
-            return _context.Clientes.Any(e => e.Id_Cliente == id);
+            if (existe)
+                return Json($"El número de documento {numeroDocumentacion} ya existe.");
+
+            return Json(true);
         }
     }
 }

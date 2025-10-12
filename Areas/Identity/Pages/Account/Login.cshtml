@@ -206,3 +206,22 @@
     }
 </body>
 </html>
+
+
+<script>
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+
+    // Cargar tema guardado
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    themeIcon.className = savedTheme === 'dark' ? 'bi bi-moon' : 'bi bi-sun';
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-bs-theme', newTheme);
+        themeIcon.className = newTheme === 'dark' ? 'bi bi-moon' : 'bi bi-sun';
+        localStorage.setItem('theme', newTheme);
+    });
+</script>

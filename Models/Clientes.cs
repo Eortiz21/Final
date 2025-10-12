@@ -1,11 +1,9 @@
-﻿using Primera.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Primera.Models
 {
-    using Microsoft.AspNetCore.Mvc;
-
     public class Cliente
     {
         [Key]
@@ -21,7 +19,8 @@ namespace Primera.Models
 
         [Required(ErrorMessage = "El DPI/Pasaporte es obligatorio")]
         [StringLength(100)]
-        [Remote(action: "VerificarDocumento", controller: "Clientes", ErrorMessage = "El número de documento ya existe")]
+        // 👇 Esta validación remota solo se aplicará en Create (no bloquea Edit)
+        [Remote(action: "VerificarDocumento", controller: "Clientes", AdditionalFields = nameof(Id_Cliente), ErrorMessage = "El número de documento ya existe")]
         public string NumeroDocumentacion { get; set; }
 
         [Required(ErrorMessage = "El teléfono es obligatorio")]
