@@ -254,13 +254,12 @@ namespace Primera.Migrations
                     Id_Ticket = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NoPlaca = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    VehiculoNoPlaca = table.Column<string>(type: "nvarchar(20)", nullable: false),
                     Id_Espacio = table.Column<int>(type: "int", nullable: false),
-                    EspacioEstacionamientoId_Espacio = table.Column<int>(type: "int", nullable: false),
                     Fecha_hora_entrada = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Fecha_hora_salida = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Id_Tarifa = table.Column<int>(type: "int", nullable: false),
-                    PagoTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Estado = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    EspacioEstacionamientoId_Espacio = table.Column<int>(type: "int", nullable: true),
+                    TarifaId_Tarifa = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -268,6 +267,11 @@ namespace Primera.Migrations
                     table.ForeignKey(
                         name: "FK_Tickets_EspacioEstacionamientos_EspacioEstacionamientoId_Espacio",
                         column: x => x.EspacioEstacionamientoId_Espacio,
+                        principalTable: "EspacioEstacionamientos",
+                        principalColumn: "Id_Espacio");
+                    table.ForeignKey(
+                        name: "FK_Tickets_EspacioEstacionamientos_Id_Espacio",
+                        column: x => x.Id_Espacio,
                         principalTable: "EspacioEstacionamientos",
                         principalColumn: "Id_Espacio",
                         onDelete: ReferentialAction.Cascade);
@@ -278,8 +282,13 @@ namespace Primera.Migrations
                         principalColumn: "Id_Tarifa",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Tickets_Vehiculos_VehiculoNoPlaca",
-                        column: x => x.VehiculoNoPlaca,
+                        name: "FK_Tickets_Tarifas_TarifaId_Tarifa",
+                        column: x => x.TarifaId_Tarifa,
+                        principalTable: "Tarifas",
+                        principalColumn: "Id_Tarifa");
+                    table.ForeignKey(
+                        name: "FK_Tickets_Vehiculos_NoPlaca",
+                        column: x => x.NoPlaca,
                         principalTable: "Vehiculos",
                         principalColumn: "NoPlaca",
                         onDelete: ReferentialAction.Cascade);
@@ -358,14 +367,24 @@ namespace Primera.Migrations
                 column: "EspacioEstacionamientoId_Espacio");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tickets_Id_Espacio",
+                table: "Tickets",
+                column: "Id_Espacio");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tickets_Id_Tarifa",
                 table: "Tickets",
                 column: "Id_Tarifa");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tickets_VehiculoNoPlaca",
+                name: "IX_Tickets_NoPlaca",
                 table: "Tickets",
-                column: "VehiculoNoPlaca");
+                column: "NoPlaca");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tickets_TarifaId_Tarifa",
+                table: "Tickets",
+                column: "TarifaId_Tarifa");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vehiculos_Id_Cliente",

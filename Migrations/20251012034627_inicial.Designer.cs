@@ -12,8 +12,8 @@ using Primera.Models;
 namespace Primera.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251005171733_CorregirTickets")]
-    partial class CorregirTickets
+    [Migration("20251012034627_inicial")]
+    partial class inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -368,6 +368,11 @@ namespace Primera.Migrations
                     b.Property<int?>("EspacioEstacionamientoId_Espacio")
                         .HasColumnType("int");
 
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime>("Fecha_hora_entrada")
                         .HasColumnType("datetime2");
 
@@ -385,16 +390,17 @@ namespace Primera.Migrations
                     b.Property<int?>("TarifaId_Tarifa")
                         .HasColumnType("int");
 
-                    b.Property<string>("VehiculoNoPlaca")
-                        .HasColumnType("nvarchar(20)");
-
                     b.HasKey("Id_Ticket");
 
                     b.HasIndex("EspacioEstacionamientoId_Espacio");
 
-                    b.HasIndex("TarifaId_Tarifa");
+                    b.HasIndex("Id_Espacio");
 
-                    b.HasIndex("VehiculoNoPlaca");
+                    b.HasIndex("Id_Tarifa");
+
+                    b.HasIndex("NoPlaca");
+
+                    b.HasIndex("TarifaId_Tarifa");
 
                     b.ToTable("Tickets");
                 });
@@ -525,17 +531,31 @@ namespace Primera.Migrations
 
             modelBuilder.Entity("Primera.Models.Ticket", b =>
                 {
-                    b.HasOne("Primera.Models.EspacioEstacionamiento", "EspacioEstacionamiento")
+                    b.HasOne("Primera.Models.EspacioEstacionamiento", null)
                         .WithMany("Tickets")
                         .HasForeignKey("EspacioEstacionamientoId_Espacio");
 
+                    b.HasOne("Primera.Models.EspacioEstacionamiento", "EspacioEstacionamiento")
+                        .WithMany()
+                        .HasForeignKey("Id_Espacio")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Primera.Models.Tarifa", "Tarifa")
-                        .WithMany("Tickets")
-                        .HasForeignKey("TarifaId_Tarifa");
+                        .WithMany()
+                        .HasForeignKey("Id_Tarifa")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Primera.Models.Vehiculo", "Vehiculo")
                         .WithMany()
-                        .HasForeignKey("VehiculoNoPlaca");
+                        .HasForeignKey("NoPlaca")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Primera.Models.Tarifa", null)
+                        .WithMany("Tickets")
+                        .HasForeignKey("TarifaId_Tarifa");
 
                     b.Navigation("EspacioEstacionamiento");
 

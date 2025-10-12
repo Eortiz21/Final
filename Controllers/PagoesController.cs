@@ -56,6 +56,16 @@ namespace Primera.Controllers
                 "NoPlaca"
             );
 
+            // Serializar los datos necesarios para cálculo en cliente
+            ViewBag.TicketsJson = System.Text.Json.JsonSerializer.Serialize(
+                ticketsEnProgreso.Select(t => new
+                {
+                    id = t.Id_Ticket,
+                    entrada = t.Fecha_hora_entrada,
+                    monto = t.Tarifa.Monto
+                })
+            );
+
             return View(new Pago());
         }
 
@@ -71,12 +81,29 @@ namespace Primera.Controllers
             if (ticket == null)
             {
                 ModelState.AddModelError("Id_Ticket", "Debe seleccionar un ticket válido.");
+
+                // Volver a cargar SelectList y Json para la vista
+                var ticketsEnProgreso = _context.Tickets
+                    .Include(t => t.Tarifa)
+                    .Where(t => t.Estado == "En Progreso")
+                    .ToList();
+
                 ViewData["Id_Ticket"] = new SelectList(
-                    _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
+                    ticketsEnProgreso,
                     "Id_Ticket",
                     "NoPlaca",
                     pago.Id_Ticket
                 );
+
+                ViewBag.TicketsJson = System.Text.Json.JsonSerializer.Serialize(
+                    ticketsEnProgreso.Select(t => new
+                    {
+                        id = t.Id_Ticket,
+                        entrada = t.Fecha_hora_entrada,
+                        monto = t.Tarifa.Monto
+                    })
+                );
+
                 return View(pago);
             }
 
@@ -95,29 +122,38 @@ namespace Primera.Controllers
                     int horasRedondeadas = (int)Math.Ceiling(horas);
                     pago.MontoPago = horasRedondeadas * ticket.Tarifa.Monto;
 
-                    ViewData["Id_Ticket"] = new SelectList(
-                        _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
-                        "Id_Ticket",
-                        "NoPlaca",
-                        pago.Id_Ticket
-                    );
-
                     TempData["MensajeExito"] = $"Monto calculado: {pago.MontoPago:C}";
 
                     ModelState.Clear();
-                    return View(pago);
                 }
                 catch (Exception ex)
                 {
                     ModelState.AddModelError("", ex.Message);
-                    ViewData["Id_Ticket"] = new SelectList(
-                        _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
-                        "Id_Ticket",
-                        "NoPlaca",
-                        pago.Id_Ticket
-                    );
-                    return View(pago);
                 }
+
+                // Recargar SelectList y Json después del cálculo
+                var ticketsEnProgreso = _context.Tickets
+                    .Include(t => t.Tarifa)
+                    .Where(t => t.Estado == "En Progreso")
+                    .ToList();
+
+                ViewData["Id_Ticket"] = new SelectList(
+                    ticketsEnProgreso,
+                    "Id_Ticket",
+                    "NoPlaca",
+                    pago.Id_Ticket
+                );
+
+                ViewBag.TicketsJson = System.Text.Json.JsonSerializer.Serialize(
+                    ticketsEnProgreso.Select(t => new
+                    {
+                        id = t.Id_Ticket,
+                        entrada = t.Fecha_hora_entrada,
+                        monto = t.Tarifa.Monto
+                    })
+                );
+
+                return View(pago);
             }
 
             if (accion == "guardar" && ModelState.IsValid)
@@ -133,7 +169,7 @@ namespace Primera.Controllers
 
                 _context.Pagos.Add(pago);
 
-                // Actualizar ticket a cerrado
+                // Actualizar ticket a "Cerrado"
                 var ticketDb = await _context.Tickets.FindAsync(ticket.Id_Ticket);
                 if (ticketDb != null)
                 {
@@ -145,12 +181,30 @@ namespace Primera.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["Id_Ticket"] = new SelectList(
-                _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
-                "Id_Ticket",
-                "NoPlaca",
-                pago.Id_Ticket
-            );
+            // Si no es válido o falla algo, recargar dropdown y JSON
+            {
+                var ticketsEnProgreso = _context.Tickets
+                    .Include(t => t.Tarifa)
+                    .Where(t => t.Estado == "En Progreso")
+                    .ToList();
+
+                ViewData["Id_Ticket"] = new SelectList(
+                    ticketsEnProgreso,
+                    "Id_Ticket",
+                    "NoPlaca",
+                    pago.Id_Ticket
+                );
+
+                ViewBag.TicketsJson = System.Text.Json.JsonSerializer.Serialize(
+                    ticketsEnProgreso.Select(t => new
+                    {
+                        id = t.Id_Ticket,
+                        entrada = t.Fecha_hora_entrada,
+                        monto = t.Tarifa.Monto
+                    })
+                );
+            }
+
             return View(pago);
         }
 
@@ -163,7 +217,7 @@ namespace Primera.Controllers
             if (pago == null) return NotFound();
 
             ViewData["Id_Ticket"] = new SelectList(
-                _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
+                _context.Tickets.Include(t => t.Tarifa),
                 "Id_Ticket",
                 "NoPlaca",
                 pago.Id_Ticket
@@ -197,7 +251,7 @@ namespace Primera.Controllers
                         int horasRedondeadas = (int)Math.Ceiling(horas);
                         pago.MontoPago = horasRedondeadas * ticket.Tarifa.Monto;
 
-                        // Actualizar ticket a cerrado
+                        // Actualizar ticket a cerrado si no lo está
                         var ticketDb = await _context.Tickets.FindAsync(ticket.Id_Ticket);
                         if (ticketDb != null)
                         {
@@ -218,11 +272,12 @@ namespace Primera.Controllers
             }
 
             ViewData["Id_Ticket"] = new SelectList(
-                _context.Tickets.Include(t => t.Tarifa).Where(t => t.Estado == "En Progreso"),
+                _context.Tickets.Include(t => t.Tarifa),
                 "Id_Ticket",
                 "NoPlaca",
                 pago.Id_Ticket
             );
+
             return View(pago);
         }
 
@@ -247,9 +302,12 @@ namespace Primera.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var pago = await _context.Pagos.FindAsync(id);
-            if (pago != null) _context.Pagos.Remove(pago);
+            if (pago != null)
+            {
+                _context.Pagos.Remove(pago);
+                await _context.SaveChangesAsync();
+            }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
     }

@@ -32,7 +32,7 @@
             <form asp-action="Create" method="post">
                 <div class="mb-3">
                     <label asp-for="Id_Ticket" class="form-label"></label>
-                    <select asp-for="Id_Ticket" class="form-select" asp-items="ViewBag.Id_Ticket">
+                    <select asp-for="Id_Ticket" class="form-select" asp-items="ViewBag.Id_Ticket" id="ticketSelect">
                         <option value="">-- Seleccione un ticket --</option>
                     </select>
                     <span asp-validation-for="Id_Ticket" class="text-danger"></span>
@@ -40,7 +40,7 @@
 
                 <div class="mb-3">
                     <label asp-for="FechaPago" class="form-label"></label>
-                    <input asp-for="FechaPago" type="datetime-local" class="form-control"
+                    <input asp-for="FechaPago" type="datetime-local" class="form-control" id="fechaPago"
                            value="@(
                            Model.FechaPago == default(DateTime)
                            ? DateTime.Now.ToString("yyyy-MM-ddTHH:mm")
@@ -51,8 +51,7 @@
 
                 <div class="mb-3">
                     <label asp-for="MontoPago" class="form-label"></label>
-                    <input asp-for="MontoPago" class="form-control" type="number" step="0.01" readonly
-                           value="@Model.MontoPago.ToString("0.00")" />
+                    <input asp-for="MontoPago" class="form-control" type="number" step="0.01" readonly id="montoPago" />
                     <span asp-validation-for="MontoPago" class="text-danger"></span>
                 </div>
 
@@ -79,9 +78,6 @@
                 </div>
 
                 <div class="mt-3">
-                    <button type="submit" name="accion" value="calcular" class="btn btn-warning me-2">
-                        Calcular Monto
-                    </button>
                     <button type="submit" name="accion" value="guardar" class="btn btn-primary">
                         Guardar Pago
                     </button>
@@ -94,4 +90,36 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        const tickets = @Html.Raw(ViewBag.TicketsJson);
+        const selectTicket = document.getElementById("ticketSelect");
+        const inputFechaPago = document.getElementById("fechaPago");
+        const inputMontoPago = document.getElementById("montoPago");
+
+        function calcularMonto() {
+            const ticketId = parseInt(selectTicket.value);
+            const fechaPagoStr = inputFechaPago.value;
+
+            if (!ticketId || !fechaPagoStr) {
+                inputMontoPago.value = "0.00";
+                return;
+            }
+
+            const ticket = tickets.find(t => t.id === ticketId);
+            if (!ticket) return;
+
+            const entrada = new Date(ticket.entrada);
+            const salida = new Date(fechaPagoStr);
+
+            let horas = (salida - entrada) / (1000 * 60 * 60); // en horas
+            if (horas < 0) horas = 0;
+            const horasRedondeadas = Math.ceil(horas);
+
+            const monto = horasRedondeadas * ticket.monto;
+            inputMontoPago.value = monto.toFixed(2);
+        }
+
+        selectTicket.addEventListener("change", calcularMonto);
+        inputFechaPago.addEventListener("change", calcularMonto);
+    </script>
 }
