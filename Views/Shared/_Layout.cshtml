@@ -17,6 +17,30 @@
 
     <!-- Estilos propios -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        #sidebar-wrapper {
+            min-width: 220px;
+            max-width: 220px;
+            transition: all 0.3s;
+        }
+
+            #sidebar-wrapper.d-none {
+                margin-left: -220px;
+            }
+
+            #sidebar-wrapper .nav-link {
+                cursor: pointer;
+            }
+
+            #sidebar-wrapper .nav .collapse .nav-link {
+                padding-left: 2rem;
+            }
+
+        #page-content-wrapper {
+            transition: all 0.3s;
+        }
+    </style>
 </head>
 <body>
     <div id="wrapper" class="d-flex">
@@ -114,7 +138,6 @@
                                                     <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
                                                 </button>
                                             </form>
-
                                         </li>
                                     </ul>
                                 </div>
@@ -157,6 +180,22 @@
             if(!confirm("¿Está seguro de que desea cerrar sesión?")){
                 e.preventDefault();
             }
+        });
+
+        // Toggle sidebar (sin persistencia)
+        const sidebarBtn = document.getElementById('sidebar-toggle-btn');
+        const sidebar = document.getElementById('sidebar-wrapper');
+        sidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('d-none');
+        });
+
+        // Submenús collapse
+        document.querySelectorAll('#sidebar-wrapper .nav-link[data-bs-toggle="collapse"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href').substring(1);
+                const target = document.getElementById(targetId);
+                new bootstrap.Collapse(target, { toggle: true });
+            });
         });
 
         // Modo oscuro con persistencia
