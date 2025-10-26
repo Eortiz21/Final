@@ -61,6 +61,17 @@
                     <select asp-for="Id_Tipo" class="form-select" asp-items="ViewBag.Id_Tipo"></select>
                     <span asp-validation-for="Id_Tipo" class="text-danger"></span>
                 </div>
+                <!-- Estado -->
+                <div class="mb-3">
+
+                    <select asp-for="Estado" class="form-select">
+                        <option value="">-- Seleccione un método --</option>
+                        <option value="En parqueo ">En parqueo </option>
+                        <option value="Fuera de parqueo">Fuera de parqueo</option>
+                    </select>
+                    <span asp-validation-for="Estado" class="text-danger"></span>
+                </div>
+
 
                 <!-- Botones -->
                 <div class="mt-4">

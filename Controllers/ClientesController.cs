@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Primera.Models;
 using System.Linq;
@@ -36,6 +37,8 @@ namespace Primera.Controllers
         // GET: Clientes/Create
         public IActionResult Create()
         {
+            // Agregar aquí ViewData para el Estado si quieres dropdown
+            ViewData["Estado"] = new SelectList(new[] { "Activo", "Inactivo" });
             return View();
         }
 
@@ -56,6 +59,7 @@ namespace Primera.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            ViewData["Estado"] = new SelectList(new[] { "Activo", "Inactivo" }, cliente.Estado);
             return View(cliente);
         }
 
@@ -67,6 +71,7 @@ namespace Primera.Controllers
             var cliente = await _context.Clientes.FindAsync(id);
             if (cliente == null) return NotFound();
 
+            ViewData["Estado"] = new SelectList(new[] { "Activo", "Inactivo" }, cliente.Estado);
             return View(cliente);
         }
 
@@ -78,7 +83,6 @@ namespace Primera.Controllers
             if (id != cliente.Id_Cliente)
                 return NotFound();
 
-            // Validar duplicado SOLO si cambió el documento
             var existente = await _context.Clientes
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id_Cliente == id);
@@ -111,6 +115,7 @@ namespace Primera.Controllers
                 }
             }
 
+            ViewData["Estado"] = new SelectList(new[] { "Activo", "Inactivo" }, cliente.Estado);
             return View(cliente);
         }
 

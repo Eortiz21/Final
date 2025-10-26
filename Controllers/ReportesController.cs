@@ -70,7 +70,7 @@ namespace Primera.Controllers
 
                 // Hoja Dashboard con gráficos
                 var wsDash = workbook.Worksheets.Add("Dashboard");
-                wsDash.Cell("A1").Value = "Dashboard AutoManager";
+                wsDash.Cell("A1").Value = "Dashboard SIPARK";
                 wsDash.Range("A1:C1").Merge().Style.Font.SetBold().Font.FontSize = 16;
                 wsDash.Range("A1:C1").Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
 
@@ -118,7 +118,7 @@ namespace Primera.Controllers
                 doc.Open();
 
                 // Portada
-                doc.Add(new Paragraph("AutoManager - Reporte General", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD)));
+                doc.Add(new Paragraph("SIPARK - Reporte General", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD)));
                 doc.Add(new Paragraph("Fecha: " + DateTime.Now.ToString("dd/MM/yyyy")));
                 doc.Add(new Paragraph(" "));
                 doc.Add(new LineSeparator());
