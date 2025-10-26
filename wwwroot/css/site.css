@@ -7,6 +7,17 @@
     --app-hover-light: #e9ecef;
     --app-hover-dark: #343a40;
 }
+#sidebar-wrapper {
+    transition: all 0.3s ease;
+}
+
+    #sidebar-wrapper.collapsed {
+        margin-left: -250px; /* ancho del sidebar */
+    }
+
+#page-content-wrapper {
+    transition: margin-left 0.3s ease;
+}
 
 /* Global */
 html {

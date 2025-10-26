@@ -12,8 +12,8 @@ using Primera.Models;
 namespace Primera.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251012034627_inicial")]
-    partial class inicial
+    [Migration("20251025034813_mejora")]
+    partial class mejora
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
