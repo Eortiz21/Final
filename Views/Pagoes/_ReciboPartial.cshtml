@@ -1,17 +1,145 @@
 ﻿@model Primera.Models.Pago
 
-<div id="reciboContenido">
-    <h3>Recibo de Pago</h3>
-    <hr />
-    <p><strong>Ticket:</strong> @Model.Ticket.NoPlaca</p>
-    <p><strong>Fecha de Entrada:</strong> @Model.Ticket.Fecha_hora_entrada</p>
-    <p><strong>Fecha de Pago:</strong> @Model.FechaPago</p>
-    <p><strong>Monto Pagado:</strong> @Model.MontoPago.ToString("C")</p>
-    <p><strong>Método de Pago:</strong> @Model.MetodoPago</p>
-    <p><strong>Estado del Pago:</strong> @Model.EstadoPago</p>
-    <p><strong>Espacio:</strong> @Model.Ticket.Id_Espacio</p>
-</div>
-<div class="mt-3 text-end">
-    <button class="btn btn-success" onclick="imprimirRecibo()">Imprimir Recibo</button>
-    <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Recibo de Pago</title>
+    <style>
+        /* ===== Estilos generales ===== */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .ticket {
+            width: 280px; /* Ideal para térmica de 80mm */
+            margin: 0 auto;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px dashed #333;
+            margin: 8px 0;
+        }
+
+        p {
+            margin: 3px 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .total {
+            font-weight: bold;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .thanks {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        /* ===== Versión para impresión ===== */
+        @@media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+
+            .ticket {
+                box-shadow: none;
+                border-radius: 0;
+                width: 100%;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+
+        /* Botón de reimpresión */
+        .no-print {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        button {
+            background: #222;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+            button:hover {
+                background: #444;
+            }
+    </style>
+</head>
+<body>
+    <div class="ticket">
+        <h2 class="center">Estacionamiento Central</h2>
+        <hr />
+        <p><strong>Ticket ID:</strong> @Model.Id_Pago</p>
+        <p><strong>Fecha de Pago:</strong> @Model.FechaPago.ToString("g")</p>
+
+        @if (Model.Ticket != null)
+        {
+            <p><strong>Placa:</strong> @Model.Ticket.NoPlaca</p>
+
+            @if (Model.Ticket.EspacioEstacionamiento != null)
+            {
+                <p>
+                    <strong>Espacio:</strong> @Model.Ticket.EspacioEstacionamiento.No_Espacio
+                    (<em>Nivel:</em> @Model.Ticket.EspacioEstacionamiento.Nivel)
+                </p>
+            }
+            else
+            {
+                <p><strong>Espacio:</strong> N/A</p>
+            }
+
+            @if (Model.Ticket.Tarifa != null)
+            {
+                <p><strong>Tarifa por Hora:</strong> Q@Model.Ticket.Tarifa.Monto.ToString("F2")</p>
+            }
+        }
+
+        <hr />
+        <p class="total">Total: Q@Model.MontoPago.ToString("F2")</p>
+        <p><strong>Método de Pago:</strong> @Model.MetodoPago</p>
+
+        <hr />
+        <p class="thanks">¡Gracias por su preferencia!<br />Vuelva pronto 🚗</p>
+    </div>
+
+    <div class="no-print">
+        <button onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+</body>
+</html>

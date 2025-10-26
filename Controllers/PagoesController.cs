@@ -1,10 +1,16 @@
-﻿using System;
+﻿using Primera.Models;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Primera.Models;
+using System.Drawing;
+using System.Drawing.Printing;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 
 namespace Primera.Controllers
 {
@@ -185,8 +191,9 @@ namespace Primera.Controllers
                 await _context.SaveChangesAsync();
                 TempData["MensajeExito"] = "Pago realizado correctamente. El espacio ha sido liberado.";
 
-                // Redirigir automáticamente a la impresión del recibo
+
                 return RedirectToAction("Print", new { id = pago.Id_Pago });
+
             }
 
             var recargarTickets = _context.Tickets
@@ -344,20 +351,80 @@ namespace Primera.Controllers
 
 
 
-
         // GET: Pagoes/Print/5
         public async Task<IActionResult> Print(int id)
         {
+            // Verificación básica de seguridad (ajusta a tu esquema de permisos)
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Forbid();
+            }
+
             var pago = await _context.Pagos
                 .Include(p => p.Ticket)
-                .ThenInclude(t => t.Vehiculo)
+                    .ThenInclude(t => t.Vehiculo)
                 .Include(p => p.Ticket)
-                .ThenInclude(t => t.EspacioEstacionamiento)
+                    .ThenInclude(t => t.EspacioEstacionamiento)
+                .Include(p => p.Ticket)
+                    .ThenInclude(t => t.Tarifa)
                 .FirstOrDefaultAsync(p => p.Id_Pago == id);
 
-            if (pago == null) return NotFound();
+            if (pago == null)
+            {
+                return NotFound();
+            }
 
-            return View(pago);
+            // Devuelve la vista "Print" con el pago como modelo
+            return View("Print", pago);
         }
+        // Método para imprimir el ticket en la impresora predeterminada
+
+        private string GenerarTicketTérmico(Pago pago)
+        {
+            var ticket = pago.Ticket;
+            var espacio = ticket?.EspacioEstacionamiento;
+            var tarifa = ticket?.Tarifa;
+
+            string texto = "=== ESTACIONAMIENTO CENTRAL ===\n";
+            texto += $"Fecha: {DateTime.Now}\n";
+            texto += $"Placa: {ticket?.NoPlaca ?? "N/A"}\n";
+            texto += $"Espacio: {espacio?.No_Espacio ?? "N/A"}\n";
+            texto += $"Nivel: {espacio?.Nivel ?? "N/A"}\n";
+            texto += $"Tarifa: Q{tarifa?.Monto ?? 0}\n";
+            texto += $"Monto Total: Q{pago.MontoPago}\n";
+            texto += $"Método: {pago.MetodoPago}\n";
+            texto += $"--------------------------------\n";
+            texto += "¡Gracias por su visita!\n";
+            texto += "==============================\n";
+            return texto;
+        }
+        private void ImprimirTicket(Pago pago)
+        {
+            string texto = GenerarTicketTérmico(pago);
+            PrintDocument pd = new PrintDocument();
+            pd.PrintPage += (sender, e) =>
+            {
+                e.Graphics.DrawString(texto, new("Consolas", 10), Brushes.Black, new PointF(0, 0));
+            };
+            pd.Print();
+        }
+
+
+        // Nuevo método para reimprimir
+        public async Task<IActionResult> Reimprimir(int id)
+        {
+            var pago = await _context.Pagos
+                .Include(p => p.Ticket)
+                .ThenInclude(t => t.EspacioEstacionamiento)
+                .Include(p => p.Ticket.Tarifa)
+                .FirstOrDefaultAsync(p => p.Id_Pago == id);
+
+            if (pago == null)
+                return NotFound();
+
+            ImprimirTicket(pago);
+            return RedirectToAction(nameof(Index));
+        }
+
     }
-}
+}
