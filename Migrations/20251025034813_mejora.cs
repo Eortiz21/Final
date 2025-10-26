@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Primera.Migrations
 {
     /// <inheritdoc />
-    public partial class inicial : Migration
+    public partial class mejora : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
