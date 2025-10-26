@@ -48,14 +48,14 @@ namespace Primera.Controllers
         {
             ViewData["NoPlaca"] = new SelectList(_context.Vehiculos, "NoPlaca", "NoPlaca");
 
-            // Dropdown de espacios libres mostrando Nivel + Estado
+            // Dropdown de espacios libres mostrando No_Espacio, Nivel y TipoEspacio
             ViewData["Id_Espacio"] = new SelectList(
                 _context.EspacioEstacionamientos
                     .Where(e => e.Estado == "Libre")
                     .Select(e => new
                     {
                         e.Id_Espacio,
-                        Display = $"Nivel {e.Nivel} - {e.Estado}"
+                        Display = $"{e.No_Espacio} - Nivel {e.Nivel} - {e.TipoEspacio}"
                     }),
                 "Id_Espacio",
                 "Display"
@@ -86,7 +86,7 @@ namespace Primera.Controllers
                     .Select(e => new
                     {
                         e.Id_Espacio,
-                        Display = $"Nivel {e.Nivel} - {e.Estado}"
+                        Display = $"{e.No_Espacio} - Nivel {e.Nivel} - {e.TipoEspacio}"
                     }),
                 "Id_Espacio",
                 "Display",
@@ -108,9 +108,14 @@ namespace Primera.Controllers
 
             ViewData["NoPlaca"] = new SelectList(_context.Vehiculos, "NoPlaca", "NoPlaca", ticket.NoPlaca);
             ViewData["Id_Espacio"] = new SelectList(
-                _context.EspacioEstacionamientos,
+                _context.EspacioEstacionamientos
+                    .Select(e => new
+                    {
+                        e.Id_Espacio,
+                        Display = $"{e.No_Espacio} - Nivel {e.Nivel} - {e.TipoEspacio}"
+                    }),
                 "Id_Espacio",
-                "Id_Espacio",
+                "Display",
                 ticket.Id_Espacio
             );
             ViewData["Id_Tarifa"] = new SelectList(_context.Tarifas, "Id_Tarifa", "TipoTarifa", ticket.Id_Tarifa);
@@ -143,9 +148,14 @@ namespace Primera.Controllers
 
             ViewData["NoPlaca"] = new SelectList(_context.Vehiculos, "NoPlaca", "NoPlaca", ticket.NoPlaca);
             ViewData["Id_Espacio"] = new SelectList(
-                _context.EspacioEstacionamientos,
+                _context.EspacioEstacionamientos
+                    .Select(e => new
+                    {
+                        e.Id_Espacio,
+                        Display = $"{e.No_Espacio} - Nivel {e.Nivel} - {e.TipoEspacio}"
+                    }),
                 "Id_Espacio",
-                "Id_Espacio",
+                "Display",
                 ticket.Id_Espacio
             );
             ViewData["Id_Tarifa"] = new SelectList(_context.Tarifas, "Id_Tarifa", "TipoTarifa", ticket.Id_Tarifa);
