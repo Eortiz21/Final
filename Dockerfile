@@ -1,30 +1,34 @@
-# Consulte https://aka.ms/customizecontainer para aprender a personalizar su contenedor de depuraci贸n y c贸mo Visual Studio usa este Dockerfile para compilar sus im谩genes para una depuraci贸n m谩s r谩pida.
-
-# Esta fase se usa cuando se ejecuta desde VS en modo r谩pido (valor predeterminado para la configuraci贸n de depuraci贸n)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-
-# Esta fase se usa para compilar el proyecto de servicio
+# Usar una imagen oficial de .NET para compilar y publicar
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["Primera.csproj", "."]
-RUN dotnet restore "./Primera.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./Primera.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-# Esta fase se usa para publicar el proyecto de servicio que se copiar谩 en la fase final.
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Primera.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# Esta fase se usa en producci贸n o cuando se ejecuta desde VS en modo normal (valor predeterminado cuando no se usa la configuraci贸n de depuraci贸n)
-FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+ENV TZ=America/Guatemala
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Copiar archivos del proyecto
+COPY . ./
+
+# Restaurar dependencias
+RUN dotnet restore
+
+# Compilar y publicar en modo release
+RUN dotnet publish -c Release -o /out
+
+# Imagen ligera para ejecuci髇
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+# Copiar la salida de la compilaci髇
+COPY --from=build /out ./
+
+# Configurar variables de entorno
+ENV ASPNETCORE_URLS=http://+:80
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+
+# Exponer el puerto 8080
+EXPOSE 80
+
+#COPY junio.pfx /junio.pfx
+
+# Comando de inicio
 ENTRYPOINT ["dotnet", "Primera.dll"]
