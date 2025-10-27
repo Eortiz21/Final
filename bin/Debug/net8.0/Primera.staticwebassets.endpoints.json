@@ -2305,6 +2305,88 @@
       ]
     },
     {
+      "Route": "Imagenes/SIPARKRecibo.0f8dfsrs7i.png",
+      "AssetFile": "Imagenes/SIPARKRecibo.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "976803"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"3Hq4XMFcxQpLLuPtyMkZRvsf4uWNhoxeofWMgokgKYg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 25 Oct 2025 22:21:27 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "0f8dfsrs7i"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-3Hq4XMFcxQpLLuPtyMkZRvsf4uWNhoxeofWMgokgKYg="
+        },
+        {
+          "Name": "label",
+          "Value": "Imagenes/SIPARKRecibo.png"
+        }
+      ]
+    },
+    {
+      "Route": "Imagenes/SIPARKRecibo.png",
+      "AssetFile": "Imagenes/SIPARKRecibo.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "976803"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"3Hq4XMFcxQpLLuPtyMkZRvsf4uWNhoxeofWMgokgKYg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 25 Oct 2025 22:21:27 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-3Hq4XMFcxQpLLuPtyMkZRvsf4uWNhoxeofWMgokgKYg="
+        }
+      ]
+    },
+    {
       "Route": "Imagenes/UMG.o6jq4p0vs6.png",
       "AssetFile": "Imagenes/UMG.png",
       "Selectors": [],
@@ -2647,7 +2729,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3298"
+          "Value": "3520"
         },
         {
           "Name": "Content-Type",
@@ -2655,22 +2737,22 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Tmb4ZYFgjpCKGQGg4j9xH1mvZck1pOOB9UpjVB9J7lI=\""
+          "Value": "\"7PpToWowyA5DcApja1tGYUSWgfsIEBdEWE5ER3WtinI=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 12 Oct 2025 20:40:03 GMT"
+          "Value": "Sun, 26 Oct 2025 15:11:50 GMT"
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-Tmb4ZYFgjpCKGQGg4j9xH1mvZck1pOOB9UpjVB9J7lI="
+          "Value": "sha256-7PpToWowyA5DcApja1tGYUSWgfsIEBdEWE5ER3WtinI="
         }
       ]
     },
     {
-      "Route": "css/site.qm4h8kpsmz.css",
+      "Route": "css/site.g7iritwquf.css",
       "AssetFile": "css/site.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -2684,7 +2766,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3298"
+          "Value": "3520"
         },
         {
           "Name": "Content-Type",
@@ -2692,21 +2774,21 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Tmb4ZYFgjpCKGQGg4j9xH1mvZck1pOOB9UpjVB9J7lI=\""
+          "Value": "\"7PpToWowyA5DcApja1tGYUSWgfsIEBdEWE5ER3WtinI=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 12 Oct 2025 20:40:03 GMT"
+          "Value": "Sun, 26 Oct 2025 15:11:50 GMT"
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "qm4h8kpsmz"
+          "Value": "g7iritwquf"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-Tmb4ZYFgjpCKGQGg4j9xH1mvZck1pOOB9UpjVB9J7lI="
+          "Value": "sha256-7PpToWowyA5DcApja1tGYUSWgfsIEBdEWE5ER3WtinI="
         },
         {
           "Name": "label",

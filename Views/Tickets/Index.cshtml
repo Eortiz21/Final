@@ -5,48 +5,73 @@
 }
 
 <h1>Tickets</h1>
+
 <p>
-    <a asp-action="Create" class="btn btn-primary">Crear Nuevo Ticket</a>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Crear Nuevo Ticket
+    </a>
 </p>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Placa</th>
-            <th>Espacio</th>
-            <th>Entrada</th>
-            <th>Tarifa</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+<!-- Barra de filtro -->
+<input type="text" id="filterInput" placeholder="Filtrar por placa, estado o tarifa..." class="form-control mb-3" />
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-3 ticket-card">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Placa: @item.Vehiculo?.NoPlaca
+                    </h5>
+                    <p class="card-text">
+                        <strong>Espacio:</strong> @item.EspacioEstacionamiento?.No_Espacio (@item.EspacioEstacionamiento?.Estado)
+                    </p>
+                    <p class="card-text">
+                        <strong>Entrada:</strong> @item.Fecha_hora_entrada.ToString("g")
+                    </p>
+                    <p class="card-text">
+                        <strong>Tarifa:</strong> @item.Tarifa?.TipoTarifa
+                    </p>
+                    <p class="card-text">
+                        <strong>Estado:</strong> @item.Estado
+                    </p>
+                </div>
+                <div class="card-footer d-flex justify-content-between flex-wrap">
+                    <a asp-action="Edit" asp-route-id="@item.Id_Ticket" class="btn btn-sm btn-primary mb-1">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.Id_Ticket" class="btn btn-sm btn-success mb-1">
+                        <i class="bi bi-eye"></i> Detalles
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Id_Ticket" class="btn btn-sm btn-danger mb-1">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="col-12 text-center">
+            <p>No hay tickets registrados.</p>
+        </div>
+    }
+</div>
 
 
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Vehiculo?.NoPlaca</td>
-                    <td>@item.EspacioEstacionamiento?.Estado</td>
-                    <td>@item.Fecha_hora_entrada.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>@item.Tarifa?.TipoTarifa </td>
-                    <td>@item.Estado</td>
+<script>
+    const filterInput = document.getElementById('filterInput');
+    filterInput.addEventListener('keyup', function () {
+        const filter = filterInput.value.toLowerCase();
+        const cards = document.querySelectorAll('.ticket-card');
 
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id_Ticket" class="btn btn-sm btn-primary">Editar</a>
-                        <a asp-action="Details" asp-route-id="@item.Id_Ticket" class="btn btn-sm btn-success">Detalles</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id_Ticket" class="btn btn-sm btn-danger">Eliminar</a>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="5" class="text-center">No hay tickets registrados.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            card.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+</script>
+
+<link rel="stylesheet" href="~/css/vehiculos.css" />

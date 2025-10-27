@@ -7,7 +7,7 @@
     var duracion = salida - entrada;
     string duracionTexto = $"{(int)duracion.TotalHours:D2}h {duracion.Minutes:D2}min";
 
-    string qrData = $"SIPARK|Pago:{Model.Id_Pago}|Placa:{Model.Ticket?.NoPlaca}|Total:Q{Model.MontoPago:F2}|Entrada:{entrada:g}|Salida:{salida:g}|Dur:{duracionTexto}";
+    string qrData = $"SIPARK|Pago:{Model.Id_Pago}|Placa:{Model.Ticket?.NoPlaca}|Total:{Model.MontoPago}|Entrada:{entrada:g}|Salida:{salida:g}|Dur:{duracionTexto}";
     string nombreArchivo = $"{Model.Ticket?.NoPlaca}_{Model.Id_Pago}_{Model.FechaPago:yyyy-MM-dd}.pdf";
 }
 
@@ -24,43 +24,44 @@
 
     <style>
         body {
-            background-color: #1f1f1f;
+            background-color: #ffffff !important;
             font-family: monospace;
+            color: #000000 !important;
         }
 
         .ticket-container {
-            max-width: 320px;
-            margin: auto;
-            margin-top: 25px;
+            background: #ffffff !important;
+            padding: 0 !important;
         }
 
         .ticket {
             width: 80mm;
-            background: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            margin: auto;
+            background: #ffffff !important;
+            border: 1px solid #000000 !important;
+            padding: 8px;
+            margin: 0 auto;
+            color: #000000 !important;
         }
 
-        hr {
-            border: 1px dashed #000;
-            margin: 5px 0;
-        }
-
-        p {
-            margin: 2px 0;
-            font-size: 12px;
-        }
+            .ticket p, .ticket strong, .ticket small, .ticket span {
+                font-size: 11px;
+                line-height: 13px;
+                color: #000000 !important;
+            }
 
         @@media print {
             body
 
         {
-            background: #fff !important;
+            background: #ffffff !important;
         }
 
         .btn-section {
             display: none !important;
+        }
+
+        .ticket {
+            border: 1px solid #000000 !important;
         }
 
         }
@@ -69,12 +70,11 @@
 
 <body>
 
-    <div class="ticket-container card shadow-lg p-3" style="background:#2b2b2b; border-radius:10px;">
+    <div class="ticket-container card shadow-lg p-3" style="background:#ffffff; border-radius:10px;">
         <div class="ticket" id="ticketDiv">
 
             <div class="text-center">
-                <img src="~/img/SIPARK Recibo.png" style="width:90px;" />
-                <p class="fw-bold m-0">SIPARK</p>
+                <img src="~/Imagenes/SIPARKRecibo.png" style="width:90px; display:block; margin:auto;" />
                 <small>Estacionamiento Inteligente</small>
             </div>
 
@@ -85,13 +85,13 @@
             <p><strong>Fecha Pago:</strong> @salida.ToString("g")</p>
             <p><strong>Duración:</strong> @duracionTexto</p>
             <p><strong>Placa:</strong> @Model.Ticket.NoPlaca</p>
-            <p><strong>Total Pagado:</strong> Q@Model.MontoPago:F2</p>
+            <p><strong>Total Pagado:</strong>"Q {@Model.MontoPago}"</p>
             <p><strong>Método Pago:</strong> @Model.MetodoPago</p>
 
             <hr />
 
             <img src="@($"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={qrData}")"
-                 style="display:block;margin:auto;width:90px;" />
+                 style="display:block; margin:auto; width:90px;" />
 
             <p class="text-center mt-1">Verifique en control de salida ✅</p>
             <p class="text-center">¡Gracias por elegir SIPARK! 🚗</p>

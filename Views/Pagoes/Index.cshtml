@@ -12,13 +12,13 @@
     </a>
 </p>
 
-<!-- Barra de filtro -->
+
 <input type="text" id="filterInput" placeholder="Filtrar por ticket, método o estado..." class="form-control mb-3" />
 
 <div class="row">
     @foreach (var item in Model)
     {
-        <div class="col-md-4 mb-3">
+        <div class="col-md-4 mb-3 ticket-card">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <h5 class="card-title">Ticket: @item.Ticket.NoPlaca</h5>
@@ -37,81 +37,103 @@
                     <a asp-action="Delete" asp-route-id="@item.Id_Pago" class="btn btn-sm btn-danger mb-1">
                         <i class="bi bi-trash"></i> Eliminar
                     </a>
-                    <!-- Botón de reimprimir recibo -->
-                    <a href="javascript:void(0);" onclick="reimprimir(@item.Id_Pago)" class="btn btn-sm btn-info mb-1">
+                    <button onclick="mostrarTicket(@item.Id_Pago)" class="btn btn-sm btn-info mb-1">
                         <i class="bi bi-printer"></i> Reimprimir
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
     }
-    @if (!Model.Any())
-    {
-        <div class="col-12 text-center">
-            <p>No hay pagos registrados.</p>
-        </div>
-    }
 </div>
 
-<!-- Modal para reimprimir recibo -->
-<div class="modal fade" id="reciboModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Recibo de Pago</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+@if (!Model.Any())
+{
+    <div class="col-12 text-center">
+        <p>No hay pagos registrados.</p>
+    </div>
+}
+
+
+<!-- ✅ Modal para vista previa del ticket -->
+
+<div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:90mm;">
+        <div class="modal-content" style="background:#000000; border-radius:8px; padding:0;" <!-- cambiar fondo -->
+
+            <div class="modal-header p-2">
+                <h6 class="modal-title">Vista Previa Ticket</h6>
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Contenido cargado vía AJAX -->
+
+            <div class="modal-body p-0" id="ticketContenido"
+                 style="width:80mm; margin:auto; padding:0;">
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <!-- Botón de imprimir dentro del modal -->
-                <button type="button" class="btn btn-primary" onclick="imprimirRecibo()">
-                    <i class="bi bi-printer"></i> Imprimir
+
+            <div class="modal-footer justify-content-center p-2 gap-1">
+                <button class="btn btn-success btn-sm" onclick="imprimirTicket()">
+                    🖨 Imprimir
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="descargarPDF()">
+                    📥 PDF
                 </button>
             </div>
+
         </div>
     </div>
 </div>
 
-<!-- Script para barra de búsqueda y AJAX -->
+
 <script>
-    // Filtro de pagos
-    const filterInput = document.getElementById('filterInput');
-    filterInput.addEventListener('keyup', function () {
-        const filter = filterInput.value.toLowerCase();
-        const cards = document.querySelectorAll('.row .col-md-4');
-        cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(filter) ? '' : 'none';
+    // ✅ Filtro de tarjetas
+    document.getElementById('filterInput').addEventListener('keyup', function () {
+        const filter = this.value.toLowerCase();
+        document.querySelectorAll('.ticket-card').forEach(card => {
+            card.style.display = card.textContent.toLowerCase().includes(filter) ? '' : 'none';
         });
     });
 
-    // Función para reimprimir
-    function reimprimir(id) {
-        fetch(`/Pagoes/ReciboPartial/${id}`)
-            .then(response => response.text())
+    // ✅ Vista previa con el contenido del ticket
+    function mostrarTicket(id) {
+        fetch(`/Pagoes/Print/${id}`)
+            .then(r => r.text())
             .then(html => {
-                document.getElementById('modalBody').innerHTML = html;
-                var modal = new bootstrap.Modal(document.getElementById('reciboModal'));
-                modal.show();
-            })
-            .catch(err => console.error(err));
+                const contenido = $(html).find('#ticketDiv').html();
+                document.getElementById('ticketContenido').innerHTML = contenido;
+                new bootstrap.Modal(document.getElementById('ticketModal')).show();
+            });
     }
 
-    // Función para imprimir el recibo
-    function imprimirRecibo() {
-        const contenido = document.getElementById('modalBody').innerHTML;
-        const ventana = window.open('', '', 'width=800,height=600');
-        ventana.document.write('<html><head><title>Imprimir Recibo</title>');
-        ventana.document.write('<link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />');
-        ventana.document.write('</head><body>');
-        ventana.document.write(contenido);
-        ventana.document.write('</body></html>');
-        ventana.document.close();
-        ventana.print();
+    // ✅ Imprimir ticket dentro del modal
+    function imprimirTicket() {
+        const ticket = document.getElementById('ticketContenido').innerHTML;
+        const original = document.body.innerHTML;
+
+        document.body.innerHTML = ticket;
+        window.print();
+        document.body.innerHTML = original;
+        location.reload();
+    }
+
+    // ✅ Descargar el PDF utilizando la vista Print
+     async function descargarPDF() {
+        const ticket = document.querySelector("#ticketContenido > div");
+
+        await html2canvas(ticket, { scale: 3 }).then(canvas => {
+            const imgData = canvas.toDataURL("~/Imagenes/SIPARKRecibo.png");
+            const pdf = new jspdf.jsPDF({
+                unit: "mm",
+                format: [80, canvas.height * 0.264583]
+            });
+
+            pdf.addImage(imgData, "PNG", 0, 0, 80, canvas.height * 0.264583);
+            pdf.save("Ticket_SIPARK.pdf");
+        });
     }
 </script>
+
+<!-- ✅ Librerías necesarias -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <link rel="stylesheet" href="~/css/vehiculos.css" />
