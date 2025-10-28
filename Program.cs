@@ -28,14 +28,14 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 
 var app = builder.Build();
 
-var defaultCulture = new CultureInfo("es");
-var localizationOptions = new RequestLocalizationOptions
-{
-    DefaultRequestCulture = new RequestCulture(defaultCulture),
-    SupportedCultures = new List<CultureInfo> { defaultCulture },
-    SupportedUICultures = new List<CultureInfo> { defaultCulture }
-};
-app.UseRequestLocalization(localizationOptions);
+////var defaultCulture = new CultureInfo("es");
+//var localizationOptions = new RequestLocalizationOptions
+//{
+//    DefaultRequestCulture = new RequestCulture(defaultCulture),
+//    SupportedCultures = new List<CultureInfo> { defaultCulture },
+//    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+//};
+//app.UseRequestLocalization(localizationOptions);
 
 if (!app.Environment.IsDevelopment())
 {

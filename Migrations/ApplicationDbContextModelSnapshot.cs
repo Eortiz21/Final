@@ -242,6 +242,11 @@ namespace Primera.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("Nombres")
                         .IsRequired()
                         .HasMaxLength(100)

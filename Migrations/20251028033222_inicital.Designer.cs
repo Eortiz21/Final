@@ -12,8 +12,8 @@ using Primera.Models;
 namespace Primera.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251026134942_Inicial")]
-    partial class Inicial
+    [Migration("20251028033222_inicital")]
+    partial class inicital
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -245,6 +245,11 @@ namespace Primera.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("Nombres")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -446,6 +451,11 @@ namespace Primera.Migrations
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("Id_Cliente")
                         .HasColumnType("int");

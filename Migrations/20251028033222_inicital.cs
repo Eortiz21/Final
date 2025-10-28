@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Primera.Migrations
 {
     /// <inheritdoc />
-    public partial class Inicial : Migration
+    public partial class inicital : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,7 +60,8 @@ namespace Primera.Migrations
                     Apellidos = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     NumeroDocumentacion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Telefono = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Direccion = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Direccion = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Estado = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -227,6 +228,7 @@ namespace Primera.Migrations
                     NoPlaca = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Marca = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Color = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    Estado = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Id_Cliente = table.Column<int>(type: "int", nullable: false),
                     Id_Tipo = table.Column<int>(type: "int", nullable: false)
                 },
