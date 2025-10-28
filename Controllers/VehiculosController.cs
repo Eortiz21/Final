@@ -51,24 +51,31 @@ namespace Primera.Controllers
         // POST: Vehiculos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NoPlaca,Marca,Color,Id_Cliente,Id_Tipo")] Vehiculo vehiculo)
+        public async Task<IActionResult> Create([Bind("NoPlaca,Marca,Color,Id_Cliente,Id_Tipo,Estado")] Vehiculo vehiculo)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
                     _context.Vehiculos.Add(vehiculo);
+
+                    // Cambiar estado del cliente a "Registrado"
+                    var cliente = await _context.Clientes.FindAsync(vehiculo.Id_Cliente);
+                    if (cliente != null)
+                    {
+                        cliente.Estado = "Registrado";
+                        _context.Clientes.Update(cliente);
+                    }
+
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateException ex)
                 {
-                    // Guardar errores en ViewBag para mostrarlos en la vista
                     ViewBag.Errores = new string[] { ex.InnerException?.Message ?? ex.Message };
                 }
             }
 
-            // Si hay error, recargar los select lists y mantener datos ingresados
             LoadSelectLists(vehiculo.Id_Cliente, vehiculo.Id_Tipo);
             return View(vehiculo);
         }
@@ -88,7 +95,7 @@ namespace Primera.Controllers
         // POST: Vehiculos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("NoPlaca,Marca,Color,Id_Cliente,Id_Tipo")] Vehiculo vehiculo)
+        public async Task<IActionResult> Edit(string id, [Bind("NoPlaca,Marca,Color,Id_Cliente,Id_Tipo,Estado")] Vehiculo vehiculo)
         {
             if (id != vehiculo.NoPlaca) return NotFound();
 
@@ -111,7 +118,6 @@ namespace Primera.Controllers
                 }
             }
 
-            // Si hay error de validación, recargar select lists
             LoadSelectLists(vehiculo.Id_Cliente, vehiculo.Id_Tipo);
             return View(vehiculo);
         }
@@ -153,7 +159,9 @@ namespace Primera.Controllers
         // Método para cargar SelectLists de clientes y tipos
         private void LoadSelectLists(int? clienteId = null, int? tipoId = null)
         {
+            // Solo clientes con Estado = "No registrado"
             var clientes = _context.Clientes
+                .Where(c => c.Estado == "No registrado")
                 .Select(c => new SelectListItem
                 {
                     Value = c.Id_Cliente.ToString(),

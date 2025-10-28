@@ -25,7 +25,11 @@
 
                 <dt class="col-sm-3">Dirección</dt>
                 <dd class="col-sm-9">@Html.DisplayFor(model => model.Direccion)</dd>
+
+                <dt class="col-sm-3">Estado</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Estado)</dd>
             </dl>
+
             <div class="mt-4">
                 <a asp-action="Edit" asp-route-id="@Model?.Id_Cliente" class="btn btn-primary me-2">
                     <i class="bi bi-pencil"></i> Editar
