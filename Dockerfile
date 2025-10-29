@@ -19,7 +19,7 @@ WORKDIR /app/Primera
 RUN dotnet publish -c Release -o /out
 
 # ===== Etapa 2: Runtime =====
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-bullseye-slim AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
 # Instalar soporte de locales y ICU para es-ES
