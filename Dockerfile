@@ -7,13 +7,15 @@ WORKDIR /app
 ENV TZ=America/Guatemala
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Copiar archivos del proyecto
+# Copiar solución y proyecto
 COPY *.sln ./
-COPY Primera/*.csproj ./Primera/
+COPY *.csproj ./
+
+# Restaurar dependencias
 RUN dotnet restore
 
-COPY Primera/. ./Primera/
-WORKDIR /app/Primera
+# Copiar todo el código fuente
+COPY . ./
 
 # Compilar y publicar en Release
 RUN dotnet publish -c Release -o /out
@@ -29,7 +31,7 @@ RUN apt-get update && apt-get install -y \
     && locale-gen es_ES.UTF-8 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiar la salida de compilación
+# Copiar la salida de compilación desde la etapa build
 COPY --from=build /out ./
 
 # Configurar variables de entorno
