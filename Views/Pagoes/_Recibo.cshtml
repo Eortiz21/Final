@@ -1,0 +1,70 @@
+﻿@model Primera.Models.Pago
+
+<div class="ticket">
+    <h2 class="center">Estacionamiento Central</h2>
+    <hr />
+    <p><strong>ID Pago:</strong> @Model.Id_Pago</p>
+    <p><strong>Fecha de Pago:</strong> @Model.FechaPago.ToString("g")</p>
+
+    @if (Model.Ticket != null)
+    {
+        <p><strong>Placa:</strong> @Model.Ticket.NoPlaca</p>
+
+        @if (Model.Ticket.EspacioEstacionamiento != null)
+        {
+            <p>
+                <strong>Espacio:</strong> @Model.Ticket.EspacioEstacionamiento.No_Espacio
+                (<em>Nivel:</em> @Model.Ticket.EspacioEstacionamiento.Nivel)
+            </p>
+        }
+
+        @if (Model.Ticket.Tarifa != null)
+        {
+            <p><strong>Tarifa por Hora:</strong> Q@Model.Ticket.Tarifa.Monto.ToString("F2")</p>
+        }
+    }
+
+    <hr />
+    <p class="total">Total: Q@Model.MontoPago.ToString("F2")</p>
+    <p><strong>Método de Pago:</strong> @Model.MetodoPago</p>
+    <hr />
+    <p class="thanks">¡Gracias por su preferencia!<br />Vuelva pronto 🚗</p>
+</div>
+
+<style>
+    .ticket {
+        width: 280px;
+        margin: 0 auto;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Courier New', monospace;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    hr {
+        border: none;
+        border-top: 1px dashed #333;
+        margin: 8px 0;
+    }
+
+    p {
+        margin: 3px 0;
+        font-size: 13px;
+    }
+
+    .total {
+        font-weight: bold;
+        text-align: right;
+    }
+
+    .thanks {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+</style>

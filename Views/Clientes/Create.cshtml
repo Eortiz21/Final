@@ -44,6 +44,17 @@
                     <span asp-validation-for="Direccion" class="text-danger"></span>
                 </div>
 
+                <div class="mb-3">
+
+                    <select asp-for="Estado" class="form-select">
+                        <option value="">-- Seleccione un método --</option>
+                        <option value="Registrado">Registrado </option>
+                        <option value="No registrado">No registrado</option>
+                    </select>
+                    <span asp-validation-for="Estado" class="text-danger"></span>
+                </div>
+
+
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary me-2">
                         <i class="bi bi-plus-circle"></i> Crear

@@ -1,41 +1,129 @@
 ﻿@model Primera.Models.Pago
+@{
+    Layout = null;
+
+    var entrada = Model.Ticket?.Fecha_hora_entrada ?? Model.FechaPago;
+    var salida = Model.FechaPago;
+    var duracion = salida - entrada;
+    string duracionTexto = $"{(int)duracion.TotalHours:D2}h {duracion.Minutes:D2}min";
+
+    string qrData = $"SIPARK|Pago:{Model.Id_Pago}|Placa:{Model.Ticket?.NoPlaca}|Total:{Model.MontoPago}|Entrada:{entrada:g}|Salida:{salida:g}|Dur:{duracionTexto}";
+    string nombreArchivo = $"{Model.Ticket?.NoPlaca}_{Model.Id_Pago}_{Model.FechaPago:yyyy-MM-dd}.pdf";
+}
 
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
-    <title>Recibo de Pago</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <title>Recibo - SIPARK</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        body {
+            background-color: #ffffff !important;
+            font-family: monospace;
+            color: #000000 !important;
+        }
+
+        .ticket-container {
+            background: #ffffff !important;
+            padding: 0 !important;
+        }
+
+        .ticket {
+            width: 80mm;
+            background: #ffffff !important;
+            border: 1px solid #000000 !important;
+            padding: 8px;
+            margin: 0 auto;
+            color: #000000 !important;
+        }
+
+            .ticket p, .ticket strong, .ticket small, .ticket span {
+                font-size: 11px;
+                line-height: 13px;
+                color: #000000 !important;
+            }
+
+        @@media print {
+            body
+
+        {
+            background: #ffffff !important;
+        }
+
+        .btn-section {
+            display: none !important;
+        }
+
+        .ticket {
+            border: 1px solid #000000 !important;
+        }
+
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container mt-5">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0">Recibo de Pago</h3>
+
+    <div class="ticket-container card shadow-lg p-3" style="background:#ffffff; border-radius:10px;">
+        <div class="ticket" id="ticketDiv">
+
+            <div class="text-center">
+                <img src="~/Imagenes/SIPARKRecibo.png" style="width:90px; display:block; margin:auto;" />
+                <small>Estacionamiento Inteligente</small>
             </div>
-            <div class="card-body">
-                <p><strong>Ticket:</strong> @Model.Ticket.NoPlaca</p>
-                <p><strong>Fecha de Entrada:</strong> @Model.Ticket.Fecha_hora_entrada</p>
-                <p><strong>Fecha de Pago:</strong> @Model.FechaPago</p>
-                <p><strong>Monto Pagado:</strong> @Model.MontoPago.ToString("C")</p>
-                <p><strong>Método de Pago:</strong> @Model.MetodoPago</p>
-                <p><strong>Estado del Pago:</strong> @Model.EstadoPago</p>
-                <p><strong>Espacio:</strong> @Model.Ticket.Id_Espacio</p>
-                @* Si quieres mostrar nivel, asegúrate de que Ticket tenga una propiedad Nivel *@
-                @* <p><strong>Nivel:</strong> @Model.Ticket.Nivel</p> *@
-            </div>
-            <div class="card-footer">
-                <button class="btn btn-success" onclick="window.print()">Imprimir Recibo</button>
-                <a asp-action="Index" class="btn btn-secondary">Volver</a>
-            </div>
+
+            <hr />
+
+            <p><strong>ID Pago:</strong> @Model.Id_Pago</p>
+            <p><strong>Fecha Entrada:</strong> @entrada.ToString("g")</p>
+            <p><strong>Fecha Pago:</strong> @salida.ToString("g")</p>
+            <p><strong>Duración:</strong> @duracionTexto</p>
+            <p><strong>Placa:</strong> @Model.Ticket.NoPlaca</p>
+            <p><strong>Total Pagado:</strong>"Q {@Model.MontoPago}"</p>
+            <p><strong>Método Pago:</strong> @Model.MetodoPago</p>
+
+            <hr />
+
+            <img src="@($"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={qrData}")"
+                 style="display:block; margin:auto; width:90px;" />
+
+            <p class="text-center mt-1">Verifique en control de salida ✅</p>
+            <p class="text-center">¡Gracias por elegir SIPARK! 🚗</p>
+
         </div>
     </div>
 
+    <div class="text-center mt-3 btn-section">
+        <button class="btn btn-success btn-sm" onclick="window.print()">🖨 Imprimir</button>
+        <button class="btn btn-info btn-sm" onclick="guardarPDF()">📥 Descargar PDF</button>
+        <a asp-action="Index" class="btn btn-secondary btn-sm">Volver</a>
+    </div>
+
+
     <script>
-        // Imprimir automáticamente al cargar la página
-        window.onload = function() {
-            window.print();
+        async function guardarPDF() {
+            const { jsPDF } = window.jspdf;
+            const ticket = document.getElementById("ticketDiv");
+
+            await html2canvas(ticket, { scale: 4 }).then(canvas => {
+                const imgData = canvas.toDataURL("image/png");
+                const pdf = new jsPDF({
+                    orientation: "portrait",
+                    unit: "mm",
+                    format: [80, 150]
+                });
+
+                pdf.addImage(imgData, "PNG", 0, 0, 80, 150);
+                pdf.save("@nombreArchivo");
+            });
         }
     </script>
+
 </body>
 </html>

@@ -46,16 +46,21 @@ namespace Primera.Controllers
         // GET: Tickets/Create
         public IActionResult Create()
         {
-            ViewData["NoPlaca"] = new SelectList(_context.Vehiculos, "NoPlaca", "NoPlaca");
+            ViewData["NoPlaca"] = new SelectList(
+                _context.Vehiculos
+                    .Where(v => v.Estado == "En parqueo")
+                    .Select(v => new { v.NoPlaca }),
+                "NoPlaca",
+                "NoPlaca"
+            );
 
-            // Dropdown de espacios libres mostrando Nivel + Estado
             ViewData["Id_Espacio"] = new SelectList(
                 _context.EspacioEstacionamientos
                     .Where(e => e.Estado == "Libre")
                     .Select(e => new
                     {
                         e.Id_Espacio,
-                        Display = $"Nivel {e.Nivel} - {e.Estado}"
+                        Display = $"{e.No_Espacio} - Nivel {e.Nivel} - {e.TipoEspacio}"
                     }),
                 "Id_Espacio",
                 "Display"
@@ -74,24 +79,46 @@ namespace Primera.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Cambiar estado del vehículo a "Fuera de parqueo"
+                var vehiculo = await _context.Vehiculos.FindAsync(ticket.NoPlaca);
+                if (vehiculo != null)
+                {
+                    vehiculo.Estado = "Fuera de parqueo";
+                    _context.Vehiculos.Update(vehiculo);
+                }
+
+                // Cambiar estado del espacio a "Ocupado"
+                var espacio = await _context.EspacioEstacionamientos.FindAsync(ticket.Id_Espacio);
+                if (espacio != null)
+                {
+                    espacio.Estado = "Ocupado";
+                    _context.EspacioEstacionamientos.Update(espacio);
+                }
+
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["NoPlaca"] = new SelectList(_context.Vehiculos, "NoPlaca", "NoPlaca", ticket.NoPlaca);
+            // Recargar dropdowns si hay error
+            ViewData["NoPlaca"] = new SelectList(
+                _context.Vehiculos.Where(v => v.Estado == "En parqueo").Select(v => new { v.NoPlaca }),
+                "NoPlaca",
+                "NoPlaca",
+                ticket.NoPlaca
+            );
+
             ViewData["Id_Espacio"] = new SelectList(
-                _context.EspacioEstacionamientos
-                    .Where(e => e.Estado == "Libre")
-                    .Select(e => new
-                    {
-                        e.Id_Espacio,
-                        Display = $"Nivel {e.Nivel} - {e.Estado}"
-                    }),
+                _context.EspacioEstacionamientos.Where(e => e.Estado == "Libre").Select(e => new
+                {
+                    e.Id_Espacio,
+                    Display = $"{e.No_Espacio} - Nivel {e.Nivel} - {e.TipoEspacio}"
+                }),
                 "Id_Espacio",
                 "Display",
                 ticket.Id_Espacio
             );
+
             ViewData["Id_Tarifa"] = new SelectList(_context.Tarifas, "Id_Tarifa", "TipoTarifa", ticket.Id_Tarifa);
             ViewData["Estado"] = new SelectList(new[] { "En Progreso", "Cerrado" }, ticket.Estado);
 
@@ -106,13 +133,25 @@ namespace Primera.Controllers
             var ticket = await _context.Tickets.FindAsync(id);
             if (ticket == null) return NotFound();
 
-            ViewData["NoPlaca"] = new SelectList(_context.Vehiculos, "NoPlaca", "NoPlaca", ticket.NoPlaca);
+            ViewData["NoPlaca"] = new SelectList(
+                _context.Vehiculos.Select(v => new { v.NoPlaca }),
+                "NoPlaca",
+                "NoPlaca",
+                ticket.NoPlaca
+            );
+
             ViewData["Id_Espacio"] = new SelectList(
-                _context.EspacioEstacionamientos,
+                _context.EspacioEstacionamientos
+                    .Select(e => new
+                    {
+                        e.Id_Espacio,
+                        Display = $"{e.No_Espacio} - Nivel {e.Nivel} - {e.TipoEspacio}"
+                    }),
                 "Id_Espacio",
-                "Id_Espacio",
+                "Display",
                 ticket.Id_Espacio
             );
+
             ViewData["Id_Tarifa"] = new SelectList(_context.Tarifas, "Id_Tarifa", "TipoTarifa", ticket.Id_Tarifa);
             ViewData["Estado"] = new SelectList(new[] { "En Progreso", "Cerrado" }, ticket.Estado);
 
@@ -141,13 +180,18 @@ namespace Primera.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["NoPlaca"] = new SelectList(_context.Vehiculos, "NoPlaca", "NoPlaca", ticket.NoPlaca);
+            ViewData["NoPlaca"] = new SelectList(_context.Vehiculos.Select(v => new { v.NoPlaca }), "NoPlaca", "NoPlaca", ticket.NoPlaca);
             ViewData["Id_Espacio"] = new SelectList(
-                _context.EspacioEstacionamientos,
+                _context.EspacioEstacionamientos.Select(e => new
+                {
+                    e.Id_Espacio,
+                    Display = $"{e.No_Espacio} - Nivel {e.Nivel} - {e.TipoEspacio}"
+                }),
                 "Id_Espacio",
-                "Id_Espacio",
+                "Display",
                 ticket.Id_Espacio
             );
+
             ViewData["Id_Tarifa"] = new SelectList(_context.Tarifas, "Id_Tarifa", "TipoTarifa", ticket.Id_Tarifa);
             ViewData["Estado"] = new SelectList(new[] { "En Progreso", "Cerrado" }, ticket.Estado);
 
@@ -178,7 +222,6 @@ namespace Primera.Controllers
             var ticket = await _context.Tickets.FindAsync(id);
             if (ticket != null)
             {
-                // Solo eliminar el ticket, no modificar el espacio
                 _context.Tickets.Remove(ticket);
                 await _context.SaveChangesAsync();
             }

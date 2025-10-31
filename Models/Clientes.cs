@@ -31,6 +31,10 @@ namespace Primera.Models
         [StringLength(200)]
         public string Direccion { get; set; }
 
+        [Required(ErrorMessage = "El estado es obligatorio")]
+        [StringLength(20)]
+        public string Estado { get; set; } = "Registrado"; // valor por defecto
+
         public ICollection<Vehiculo> Vehiculos { get; set; } = new List<Vehiculo>();
     }
 }

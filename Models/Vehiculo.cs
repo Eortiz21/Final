@@ -20,6 +20,11 @@ namespace Primera.Models
         [StringLength(30)]
         public string Color { get; set; }
 
+        [Required(ErrorMessage = "El estado es obligatorio")]
+        [StringLength(20)]
+        public string Estado { get; set; } = "En parqueo"; // valor por defecto
+
+
         [Required(ErrorMessage = "Debe seleccionar un cliente")]
         public int Id_Cliente { get; set; }
 
