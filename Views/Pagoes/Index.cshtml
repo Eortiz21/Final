@@ -13,6 +13,7 @@
 </p>
 
 
+
 <input type="text" id="filterInput" placeholder="Filtrar por ticket, método o estado..." class="form-control mb-3" />
 
 <div class="row">
@@ -22,8 +23,8 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body">
                     <h5 class="card-title">Ticket: @item.Ticket.NoPlaca</h5>
-                    <p class="card-text"><strong>Monto:</strong> @item.MontoPago.ToString("C")</p>
-                    <p class="card-text"><strong>Fecha:</strong> @item.FechaPago.ToString("yyyy-MM-dd")</p>
+                    <p><strong>Total Pagado:</strong> @item.MontoPago.ToString("C", new System.Globalization.CultureInfo("es-GT"))</p>
+                    <p class="card-text"><strong>Fecha:</strong> @item.FechaPago.ToString("dd/MM/yyyy hh:mm tt")</p>
                     <p class="card-text"><strong>Método:</strong> @item.MetodoPago</p>
                     <p class="card-text"><strong>Estado:</strong> @item.EstadoPago</p>
                 </div>
@@ -73,9 +74,10 @@
                 <button class="btn btn-success btn-sm" onclick="imprimirTicket()">
                     🖨 Imprimir
                 </button>
-                <button class="btn btn-primary btn-sm" onclick="descargarPDF()">
-                    📥 PDF
-                </button>
+               <button class="btn btn-primary btn-sm" onclick="descargarPDF()">
+                   📥 PDF
+                   </button>
+
             </div>
 
         </div>
@@ -92,16 +94,26 @@
         });
     });
 
-    // ✅ Vista previa con el contenido del ticket
-    function mostrarTicket(id) {
+    // ✅ Mostrar vista previa del ticket
+        function mostrarTicket(id) {
         fetch(`/Pagoes/Print/${id}`)
             .then(r => r.text())
             .then(html => {
-                const contenido = $(html).find('#ticketDiv').html();
-                document.getElementById('ticketContenido').innerHTML = contenido;
-                new bootstrap.Modal(document.getElementById('ticketModal')).show();
+                // Carga el HTML completo de la vista Print
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+
+                // Extrae solo la parte del ticket completo con estilos
+                const ticket = doc.querySelector("#ticketDiv");
+                if (ticket) {
+                    document.getElementById("ticketContenido").innerHTML = ticket.outerHTML;
+                    new bootstrap.Modal(document.getElementById("ticketModal")).show();
+                } else {
+                    alert("No se pudo cargar el ticket correctamente.");
+                }
             });
     }
+
 
     // ✅ Imprimir ticket dentro del modal
     function imprimirTicket() {
@@ -114,21 +126,67 @@
         location.reload();
     }
 
-    // ✅ Descargar el PDF utilizando la vista Print
-     async function descargarPDF() {
-        const ticket = document.querySelector("#ticketContenido > div");
+    // ✅ Descargar PDF COMPLETO del ticket
+        async function descargarPDF() {
+        const { jsPDF } = window.jspdf;
+        const ticket = document.getElementById("ticketContenido").querySelector("#ticketDiv");
 
-        await html2canvas(ticket, { scale: 3 }).then(canvas => {
-            const imgData = canvas.toDataURL("~/Imagenes/SIPARKRecibo.png");
-            const pdf = new jspdf.jsPDF({
+        if (!ticket) {
+            alert("No se encontró el contenido del ticket.");
+            return;
+        }
+
+        // Clon temporal para asegurar que html2canvas capture todo el contenido visible
+        const clon = ticket.cloneNode(true);
+        clon.style.position = "absolute";
+        clon.style.left = "0";
+        clon.style.top = "0";
+        clon.style.background = "#ffffff";
+        clon.style.color = "#000000";
+        clon.style.zIndex = "-1";
+        clon.id = "clonTicketTemp";
+        document.body.appendChild(clon);
+
+        // 🔹 Extraer datos reales del ticket para el nombre del archivo
+        let placa = "Ticket";
+        let idPago = "000";
+        let fechaPago = new Date().toISOString().split("T")[0];
+
+        clon.querySelectorAll("p").forEach(p => {
+            if (p.textContent.includes("Placa:"))
+                placa = p.textContent.split(":")[1].trim();
+            if (p.textContent.includes("ID Pago:"))
+                idPago = p.textContent.split(":")[1].trim();
+            if (p.textContent.includes("Fecha Pago:")) {
+                const match = p.textContent.match(/\d{4}-\d{2}-\d{2}/);
+                if (match) fechaPago = match[0];
+            }
+        });
+
+        // 🔹 Formato exacto solicitado
+        const nombreArchivo = `${placa}_${idPago}_${fechaPago}.pdf`;
+
+        // Generar imagen del ticket y crear PDF
+        await html2canvas(clon, {
+            scale: 4,
+            useCORS: true,
+            backgroundColor: "#ffffff"
+        }).then(canvas => {
+            const imgData = canvas.toDataURL("image/png");
+            const pdfHeight = (canvas.height * 85) / canvas.width;
+            const pdf = new jsPDF({
+                orientation: "portrait",
                 unit: "mm",
-                format: [80, canvas.height * 0.264583]
+                format: [85, pdfHeight]
             });
 
-            pdf.addImage(imgData, "PNG", 0, 0, 80, canvas.height * 0.264583);
-            pdf.save("Ticket_SIPARK.pdf");
+            pdf.addImage(imgData, "PNG", 0, 0, 85, pdfHeight);
+            pdf.save(nombreArchivo);
         });
+
+        clon.remove();
     }
+
 </script>
 
 <!-- ✅ Librerías necesarias -->

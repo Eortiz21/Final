@@ -50,19 +50,17 @@
             }
 
         @@media print {
-            body
+            body {
+                background: #ffffff !important;
+            }
 
-        {
-            background: #ffffff !important;
-        }
+            .btn-section {
+                display: none !important;
+            }
 
-        .btn-section {
-            display: none !important;
-        }
-
-        .ticket {
-            border: 1px solid #000000 !important;
-        }
+            .ticket {
+                border: 1px solid #000000 !important;
+            }
 
         }
     </style>
@@ -81,11 +79,11 @@
             <hr />
 
             <p><strong>ID Pago:</strong> @Model.Id_Pago</p>
-            <p><strong>Fecha Entrada:</strong> @entrada.ToString("g")</p>
-            <p><strong>Fecha Pago:</strong> @salida.ToString("g")</p>
+            <p><strong>Fecha Entrada:</strong> @entrada.ToString("dd/MM/yyyy hh:mm tt")</p>
+            <p><strong>Fecha Pago:</strong> @salida.ToString("dd/MM/yyyy hh:mm tt")</p>
             <p><strong>Duración:</strong> @duracionTexto</p>
             <p><strong>Placa:</strong> @Model.Ticket.NoPlaca</p>
-            <p><strong>Total Pagado:</strong>"Q {@Model.MontoPago}"</p>
+            <p><strong>Total Pagado:</strong> @Model.MontoPago.ToString("C", new System.Globalization.CultureInfo("es-GT"))</p>
             <p><strong>Método Pago:</strong> @Model.MetodoPago</p>
 
             <hr />

@@ -25,17 +25,10 @@
                         Placa: @item.Vehiculo?.NoPlaca
                     </h5>
                     <p class="card-text">
-                        <strong>Espacio:</strong> @item.EspacioEstacionamiento?.No_Espacio (@item.EspacioEstacionamiento?.Estado)
-                    </p>
-                    <p class="card-text">
-                        <strong>Entrada:</strong> @item.Fecha_hora_entrada.ToString("g")
-                    </p>
-                    <p class="card-text">
-                        <strong>Tarifa:</strong> @item.Tarifa?.TipoTarifa
-                    </p>
-                    <p class="card-text">
-                        <strong>Estado:</strong> @item.Estado
-                    </p>
+                        <strong>Espacio:</strong> @item.EspacioEstacionamiento?.No_Espacio (@item.EspacioEstacionamiento?.Estado)</p>
+                    <p class="card-text"> <strong>Entrada:</strong> @item.Fecha_hora_entrada.ToString("dd/MM/yyyy hh:mm tt")</p>
+                    <p class="card-text"><strong>Tarifa:</strong> @item.Tarifa?.TipoTarifa</p>
+                    <p class="card-text"><strong>Estado:</strong> @item.Estado</p>
                 </div>
                 <div class="card-footer d-flex justify-content-between flex-wrap">
                     <a asp-action="Edit" asp-route-id="@item.Id_Ticket" class="btn btn-sm btn-primary mb-1">
