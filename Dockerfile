@@ -35,14 +35,15 @@ RUN apt-get update && apt-get install -y \
 COPY --from=build /out ./
 
 # Configurar variables de entorno
-ENV ASPNETCORE_URLS=http://+:80
+ENV ASPNETCORE_URLS="http://+:80;https://+:443"
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENV LANG=es_ES.UTF-8
 ENV LANGUAGE=es_ES:es
 ENV LC_ALL=es_ES.UTF-8
 
-# Exponer puerto
+# Exponer puertos HTTP y HTTPS
 EXPOSE 80
+EXPOSE 443
 
 # Comando de inicio
 ENTRYPOINT ["dotnet", "Primera.dll"]
